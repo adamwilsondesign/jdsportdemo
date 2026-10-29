@@ -1,0 +1,469 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { CardProduct, CartLine } from "@/lib/types";
+import { FREE_SHIPPING_THRESHOLD, LOW_STOCK_THRESHOLD, RETURNS_SUMMARY, formatMoney, shopifyImage } from "@/lib/format";
+import { toMerchandise } from "@/lib/merch";
+import { useStore } from "@/components/providers/StoreProvider";
+import { Overlay } from "@/components/ui/Overlay";
+import { BagIcon, CheckIcon, ChevronDown, CloseIcon, EditIcon, HeartIcon, InfoIcon, MinusIcon, PlusIcon, ReturnIcon, TruckIcon } from "@/components/ui/Icons";
+import { PaymentIcons } from "@/components/ui/PaymentIcons";
+import { Price } from "@/components/product/bits";
+
+// ---------------------------------------------------------------------------
+// Free shipping progress — dollar-based, accessible (brief §6.C.2)
+// ---------------------------------------------------------------------------
+export function FreeShippingProgress({ subtotal }: { subtotal: number }) {
+  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const pct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  return (
+    <div>
+      <p className="flex items-center gap-2 text-[13px] font-semibold" aria-live="polite">
+        {remaining > 0 ? (
+          <>
+            <TruckIcon size={18} /> You&apos;re <span className="t-price">{formatMoney(remaining)}</span> away from free standard shipping
+          </>
+        ) : (
+          <>
+            <CheckIcon size={18} className="text-success" /> Your order qualifies for free standard shipping
+          </>
+        )}
+      </p>
+      <div
+        className="mt-2 h-1.5 overflow-hidden bg-line"
+        role="progressbar"
+        aria-label="Progress to free standard shipping"
+        aria-valuemin={0}
+        aria-valuemax={FREE_SHIPPING_THRESHOLD}
+        aria-valuenow={Math.min(subtotal, FREE_SHIPPING_THRESHOLD)}
+      >
+        <div className={`h-full transition-[width] duration-500 ease-[var(--ease-out-soft)] ${remaining > 0 ? "bg-ink" : "bg-success"}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Line item
+// ---------------------------------------------------------------------------
+function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
+  const { updateQuantity, removeLine, saveForLater, lastAddedId, setCartOpen } = useStore();
+  const [editing, setEditing] = useState(false);
+  const m = line.merchandise;
+  const unit = Number(m.price.amount);
+  const cmp = m.compareAtPrice ? Number(m.compareAtPrice.amount) : null;
+  const max = Math.min(10, m.quantityAvailable);
+  const unavailable = m.quantityAvailable === 0;
+  const isNew = lastAddedId === m.id;
+  const label = `${m.product.brand} ${m.product.model}`;
+
+  return (
+    <li className={`py-5 ${isNew ? "animate-rise" : ""}`}>
+      <div className="flex gap-4">
+        <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className={`relative shrink-0 bg-image ${compact ? "h-[104px] w-[104px]" : "h-32 w-32 md:h-40 md:w-40"}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={shopifyImage(m.product.image, 320)} alt="" className="h-full w-full object-cover" />
+        </Link>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="t-eyebrow text-[10px] text-muted">{m.product.brand}</p>
+              <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className="block text-[14px] font-semibold leading-snug hover:underline">
+                {m.product.model}
+              </Link>
+            </div>
+            <div className="text-right">
+              <p className="t-price text-[14px]">{formatMoney(unit * line.quantity)}</p>
+              {cmp && <s className="t-price block text-[12px] font-normal text-subtle">{formatMoney(cmp * line.quantity)}</s>}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setEditing((e) => !e)}
+            aria-expanded={editing}
+            className="mt-1.5 inline-flex w-fit items-center gap-1.5 text-left text-[12.5px] text-muted hover:text-ink"
+          >
+            <span className="line-clamp-1">
+              {m.product.colourway} · <span className="font-semibold text-ink">Size {m.title}</span>
+            </span>
+            <EditIcon size={13} className="shrink-0" />
+            <span className="sr-only">Edit colour or size</span>
+          </button>
+
+          {cmp && <p className="mt-1 text-[11.5px] font-bold uppercase tracking-wide text-sale">You save {formatMoney((cmp - unit) * line.quantity)}</p>}
+          {unavailable ? (
+            <p className="mt-1.5 text-[12px] font-semibold text-sale">No longer available in size {m.title} — choose another size to keep it in your order.</p>
+          ) : (
+            m.quantityAvailable <= LOW_STOCK_THRESHOLD && <p className="mt-1.5 text-[12px] font-semibold text-warn">Only {m.quantityAvailable} left in size {m.title}</p>
+          )}
+
+          <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+            <div className="flex h-9 items-center border border-line" role="group" aria-label={`Quantity for ${label}`}>
+              <button type="button" onClick={() => (line.quantity === 1 ? removeLine(line.id) : updateQuantity(line.id, line.quantity - 1))} className="grid h-full w-9 place-items-center hover:bg-surface" aria-label={line.quantity === 1 ? `Remove ${label}` : "Decrease quantity"}>
+                <MinusIcon size={14} />
+              </button>
+              <span className="w-7 text-center text-[13px] font-semibold tabular-nums" aria-live="polite">
+                {line.quantity}
+              </span>
+              <button type="button" onClick={() => updateQuantity(line.id, line.quantity + 1)} disabled={line.quantity >= max} className="grid h-full w-9 place-items-center hover:bg-surface disabled:text-line-strong disabled:hover:bg-transparent" aria-label="Increase quantity">
+                <PlusIcon size={14} />
+              </button>
+            </div>
+            <div className="flex items-center gap-3 text-[12px] font-semibold">
+              <button type="button" onClick={() => saveForLater(line.id)} className="inline-flex items-center gap-1 text-muted hover:text-ink">
+                <HeartIcon size={14} /> Save<span className="hidden sm:inline"> for later</span>
+              </button>
+              <button type="button" onClick={() => removeLine(line.id)} className="text-muted underline underline-offset-2 hover:text-ink">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {editing && <VariantEditor line={line} onDone={() => setEditing(false)} />}
+    </li>
+  );
+}
+
+/** Inline colour/size editing with availability + price revalidation (brief §6.A.1). */
+function VariantEditor({ line, onDone }: { line: CartLine; onDone: () => void }) {
+  const { replaceMerchandise, toast } = useStore();
+  const [data, setData] = useState<{ card: CardProduct; siblings: CardProduct[] } | null>(null);
+  const [error, setError] = useState(false);
+  const [handle, setHandle] = useState(line.merchandise.product.handle);
+  const [size, setSize] = useState(line.merchandise.title);
+
+  useEffect(() => {
+    let live = true;
+    fetch(`/api/products/${line.merchandise.product.handle}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => live && setData(d))
+      .catch(() => live && setError(true));
+    return () => {
+      live = false;
+    };
+  }, [line.merchandise.product.handle]);
+
+  if (error) return <p className="mt-3 text-[12px] text-sale">Couldn&apos;t load options. Please try again.</p>;
+  if (!data)
+    return (
+      <div className="mt-4 space-y-2" aria-busy="true" aria-label="Loading options">
+        <div className="skeleton h-10" />
+        <div className="skeleton h-20" />
+      </div>
+    );
+
+  const current = data.siblings.find((s) => s.handle === handle) ?? data.card;
+  const variant = current.variants.find((v) => v.title === size);
+  const sizeOk = !!variant?.available;
+  const changed = handle !== line.merchandise.product.handle || size !== line.merchandise.title;
+  const priceChanged = current.price !== Number(line.merchandise.price.amount);
+
+  return (
+    <div className="mt-4 animate-rise border border-line bg-surface/60 p-4">
+      {data.siblings.length > 1 && (
+        <fieldset>
+          <legend className="t-eyebrow mb-2 text-[10px]">
+            Colour · <span className="font-semibold normal-case tracking-normal text-muted">{current.colourway}</span>
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {data.siblings.map((s) => (
+              <button
+                key={s.handle}
+                type="button"
+                onClick={() => setHandle(s.handle)}
+                aria-pressed={s.handle === handle}
+                aria-label={s.colourway}
+                className={`h-12 w-12 overflow-hidden bg-image ${s.handle === handle ? "ring-2 ring-ink ring-offset-1" : "ring-1 ring-line"}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={shopifyImage(s.image, 120)} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      <fieldset className="mt-3">
+        <legend className="t-eyebrow mb-2 text-[10px]">Size</legend>
+        <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-6">
+          {current.variants.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              disabled={!v.available}
+              onClick={() => setSize(v.title)}
+              aria-pressed={v.title === size}
+              className={`h-9 border text-[12px] font-semibold tabular-nums ${
+                v.title === size ? "border-ink bg-ink text-white" : v.available ? "border-line bg-white hover:border-ink" : "border-line bg-white text-subtle line-through"
+              }`}
+            >
+              {v.title}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      {!sizeOk && <p className="mt-2 text-[12px] font-semibold text-sale">Size {size} isn&apos;t available in this colour — pick another size.</p>}
+      {sizeOk && priceChanged && (
+        <p className="mt-2 text-[12px] text-muted">
+          Price for this colour: <b className="text-ink">{formatMoney(current.price)}</b>
+        </p>
+      )}
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          disabled={!sizeOk || !changed}
+          onClick={() => {
+            if (!variant) return;
+            replaceMerchandise(line.id, toMerchandise(data.card, current, variant));
+            toast({ message: `Updated to ${current.colourway}, size ${size}`, tone: "success" });
+            onDone();
+          }}
+          className="btn btn-primary h-10 min-h-0 flex-1 text-[13px]"
+        >
+          Update item
+        </button>
+        <button type="button" onClick={onDone} className="btn btn-outline h-10 min-h-0 text-[13px]">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Summary
+// ---------------------------------------------------------------------------
+export function CartSummary({ onCheckout, compact }: { onCheckout?: () => void; compact?: boolean }) {
+  const { subtotal, savings, totalQuantity, lines } = useStore();
+  const [why, setWhy] = useState(false);
+  const blocked = lines.some((l) => l.merchandise.quantityAvailable === 0);
+  const afterpay = subtotal >= 35 && subtotal <= 2000;
+  return (
+    <div>
+      <dl className={`text-[13.5px] ${compact ? "space-y-1" : "space-y-2"}`}>
+        <div className={`justify-between ${compact && !savings ? "hidden" : "flex"}`}>
+          <dt>Subtotal ({totalQuantity} {totalQuantity === 1 ? "item" : "items"})</dt>
+          <dd className="t-price">{formatMoney(subtotal + savings)}</dd>
+        </div>
+        {savings > 0 && (
+          <div className="flex justify-between font-semibold text-sale">
+            <dt>Sale savings</dt>
+            <dd className="t-price">−{formatMoney(savings)}</dd>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <dt className="flex items-center gap-1">
+            Shipping
+            <button type="button" onClick={() => setWhy((w) => !w)} aria-expanded={why} aria-label="Why are shipping and tax calculated at checkout?" className="grid h-6 w-6 place-items-center text-muted">
+              <InfoIcon size={14} />
+            </button>
+          </dt>
+          <dd className="text-muted">{subtotal >= FREE_SHIPPING_THRESHOLD ? <span className="font-semibold text-success">Free</span> : "Calculated at checkout"}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt>Tax</dt>
+          <dd className="text-muted">TBD</dd>
+        </div>
+        {why && <p className="animate-fade-in bg-surface p-3 text-[12px] text-muted">Shipping rates and GST/HST/PST depend on your delivery address, so we calculate them at checkout once you enter it.</p>}
+        <div className={`flex justify-between border-t border-line text-[15px] font-bold ${compact ? "pt-2" : "pt-3"}`}>
+          <dt>Estimated total</dt>
+          <dd className="t-price">{formatMoney(subtotal)}</dd>
+        </div>
+      </dl>
+      {afterpay && (
+        <p className="mt-2 text-[12px] text-muted">
+          or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((subtotal / 4) * 100) / 100)}</b> with Afterpay
+        </p>
+      )}
+      <Link
+        href="/checkout"
+        onClick={onCheckout}
+        aria-disabled={blocked}
+        className={`btn btn-primary w-full text-[15px] ${compact ? "mt-3" : "mt-4"} ${blocked ? "pointer-events-none opacity-40" : ""}`}
+      >
+        Checkout securely
+      </Link>
+      <Link href="/checkout?express=shop-pay" onClick={onCheckout} className="btn mt-2 h-11 min-h-0 w-full bg-shoppay text-white hover:brightness-110" aria-label="Express checkout with Shop Pay">
+        Buy with <span className="font-extrabold italic tracking-tight">shop</span>
+        <span className="-ml-1.5 rounded-sm bg-white px-1 text-[11px] font-extrabold text-shoppay">Pay</span>
+      </Link>
+      {!compact && <PaymentIcons className="mt-3 justify-center" />}
+      <p className={`flex items-center justify-center gap-1.5 text-[11.5px] text-muted ${compact ? "mt-2.5" : "mt-3"}`}>
+        <ReturnIcon size={14} /> {RETURNS_SUMMARY}.{" "}
+        <Link href="/pages/returns" className="link-underline">
+          Details
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Complete the look — compact, collapsible, genuinely complementary (brief §6.C.1)
+// ---------------------------------------------------------------------------
+function CompleteTheLook({ handle, defaultOpen }: { handle: string; defaultOpen: boolean }) {
+  const [items, setItems] = useState<CardProduct[] | null>(null);
+  const [open, setOpen] = useState(defaultOpen);
+  const { addToCart, lines } = useStore();
+  const [added, setAdded] = useState<string | null>(null);
+  useEffect(() => {
+    fetch(`/api/products/${handle}`)
+      .then((r) => r.json())
+      .then((d) => setItems(d.completeTheLook))
+      .catch(() => setItems([]));
+  }, [handle]);
+  const inCart = new Set(lines.map((l) => l.merchandise.product.handle));
+  const list = (items ?? []).filter((p) => !inCart.has(p.handle));
+  if (items && !list.length) return null;
+  return (
+    <div className="border-t border-line pt-4">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center justify-between py-1 text-left">
+        <span className="t-eyebrow">Complete the look</span>
+        <ChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <ul className="mt-3 space-y-3">
+          {!items
+            ? [0, 1].map((i) => <li key={i} className="skeleton h-16" />)
+            : list.map((p) => {
+                const v = p.variants.find((x) => x.available && (x.title === "M" || x.title === "10" || x.title === "One Size")) ?? p.variants.find((x) => x.available);
+                return (
+                  <li key={p.handle} className="flex items-center gap-3">
+                    <Link href={`/products/${p.handle}`} className="h-16 w-16 shrink-0 bg-image">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={shopifyImage(p.image, 160)} alt="" className="h-full w-full object-cover" />
+                    </Link>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[12.5px] font-semibold">
+                        {p.brand} {p.model}
+                      </p>
+                      <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
+                    </div>
+                    {v && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addToCart(toMerchandise(p, p, v), 1, { openDrawer: false });
+                          setAdded(p.handle);
+                        }}
+                        className="btn btn-outline h-9 min-h-0 px-3 text-[12px]"
+                        aria-label={`Add ${p.brand} ${p.model}, size ${v.title}`}
+                      >
+                        {added === p.handle ? <CheckIcon size={14} /> : `Add · ${v.title}`}
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function EmptyCart({ onClose }: { onClose?: () => void }) {
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+      <span className="grid h-16 w-16 place-items-center rounded-full bg-surface">
+        <BagIcon size={26} />
+      </span>
+      <p className="t-h3 mt-5">Your cart is empty</p>
+      <p className="t-meta mt-1 max-w-[260px] text-[13px]">Free standard shipping on orders over $99. Start with what&apos;s new this week.</p>
+      <div className="mt-6 flex w-full max-w-[280px] flex-col gap-2">
+        <Link href="/collections/new-arrivals" onClick={onClose} className="btn btn-primary">
+          Shop New Arrivals
+        </Link>
+        <Link href="/favourites" onClick={onClose} className="btn btn-outline">
+          View Favourites
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Drawer — summary + checkout pinned while lines scroll (brief §6.C.3)
+// ---------------------------------------------------------------------------
+export function CartDrawer() {
+  const { cartOpen, setCartOpen, lines, totalQuantity, subtotal, hydrated } = useStore();
+  const close = () => setCartOpen(false);
+  return (
+    <Overlay open={cartOpen} onClose={close} side="right" label={`Your cart, ${totalQuantity} items`}>
+      <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-5">
+        <h2 className="text-[15px] font-extrabold uppercase tracking-wide">
+          Your cart <span className="tabular-nums">({hydrated ? totalQuantity : 0})</span>
+        </h2>
+        <button type="button" onClick={close} aria-label="Close cart" className="-mr-2 grid h-11 w-11 place-items-center" data-autofocus>
+          <CloseIcon />
+        </button>
+      </div>
+      {!lines.length ? (
+        <EmptyCart onClose={close} />
+      ) : (
+        <>
+          <div className="shrink-0 border-b border-line px-5 py-4">
+            <FreeShippingProgress subtotal={subtotal} />
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-5">
+            <ul className="divide-y divide-line">
+              {lines.map((l) => (
+                <LineItem key={l.id} line={l} compact />
+              ))}
+            </ul>
+            <div className="pb-5">
+              <CompleteTheLook handle={lines[0].merchandise.product.handle} defaultOpen={false} />
+            </div>
+          </div>
+          <div className="shrink-0 border-t border-line bg-white px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)]">
+            <CartSummary onCheckout={close} compact />
+            <div className="mt-2 flex justify-center gap-4 text-[12.5px] font-semibold">
+              <button type="button" onClick={close} className="link-underline">
+                Continue shopping
+              </button>
+              <Link href="/cart" onClick={close} className="link-underline">
+                View full cart
+              </Link>
+            </div>
+          </div>
+        </>
+      )}
+    </Overlay>
+  );
+}
+
+export function CartPageView() {
+  const { lines, subtotal, hydrated, totalQuantity } = useStore();
+  if (!hydrated) return <div className="container-jd py-16"><div className="skeleton h-64" /></div>;
+  return (
+    <div className="container-jd py-8 md:py-12">
+      <h1 className="t-h1">
+        Your cart <span className="text-muted">({totalQuantity})</span>
+      </h1>
+      {!lines.length ? (
+        <EmptyCart />
+      ) : (
+        <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_400px]">
+          <div>
+            <div className="border border-line p-4">
+              <FreeShippingProgress subtotal={subtotal} />
+            </div>
+            <ul className="divide-y divide-line">
+              {lines.map((l) => (
+                <LineItem key={l.id} line={l} />
+              ))}
+            </ul>
+          </div>
+          <aside className="h-fit border border-line p-6 lg:sticky lg:top-28">
+            <h2 className="t-eyebrow mb-4">Order summary</h2>
+            <CartSummary />
+            <div className="mt-6">
+              <CompleteTheLook handle={lines[0].merchandise.product.handle} defaultOpen />
+            </div>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
