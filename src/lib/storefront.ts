@@ -58,8 +58,13 @@ export function toCard(p: Product): CardProduct {
     exclusive: p.exclusive,
     publishedAt: p.publishedAt,
     reviews: p.reviews,
-    swatches: p.siblings.length ? [p, ...getSiblings(p)].map(cardBasics) : [],
+    swatches: p.siblings.length ? getColourFamily(p).map(cardBasics) : [],
   };
+}
+
+/** The whole colourway family (including p) in a fixed order, so lists never reshuffle on selection. */
+export function getColourFamily(p: Product) {
+  return [p, ...getSiblings(p)].sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export function getSiblings(p: Product) {

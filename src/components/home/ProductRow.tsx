@@ -11,7 +11,7 @@ import { ArrowRightIcon } from "@/components/ui/Icons";
 export function ProductRow({ id, title, products, viewAll }: { id: string; title: string; products: CardProduct[]; viewAll: { href: string; count: number } }) {
   const top = products.slice(0, 5);
   return (
-    <section aria-labelledby={`${id}-title`} className="py-12 md:py-16">
+    <section aria-labelledby={`${id}-title`} className="reveal py-12 md:py-16">
       <div className="container-jd">
         <div className="mb-6 flex items-end justify-between gap-6">
           <h2 id={`${id}-title`} className="t-h2">

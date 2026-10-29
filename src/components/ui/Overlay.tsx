@@ -30,6 +30,7 @@ export function Overlay({
   className = "",
   dismissOnBackdrop = true,
   mobileSide,
+  backdrop = "dim",
 }: {
   open: boolean;
   onClose: () => void;
@@ -39,6 +40,7 @@ export function Overlay({
   children: ReactNode;
   className?: string;
   dismissOnBackdrop?: boolean;
+  backdrop?: "dim" | "blur";
 }) {
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -113,7 +115,7 @@ export function Overlay({
   return createPortal(
     <div className="fixed inset-0 z-[100]">
       <div
-        className={`absolute inset-0 bg-black/45 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 transition-opacity duration-300 ${backdrop === "blur" ? "bg-white/70 backdrop-blur-xl" : "bg-black/45"} ${visible ? "opacity-100" : "opacity-0"}`}
         onClick={dismissOnBackdrop ? onClose : undefined}
         aria-hidden
       />

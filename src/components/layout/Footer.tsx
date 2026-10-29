@@ -40,7 +40,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="container-jd relative grid gap-10 py-14 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
+      <div className="container-jd relative grid gap-10 py-14 lg:grid-cols-[1.3fr_repeat(4,1fr)] [&:has(ul_a:hover)_ul_a:not(:hover)]:opacity-60">
         <div className="max-w-sm">
           <JDLogo size={52} />
           <p className="t-h3 mt-6">Get on the list</p>
@@ -56,13 +56,13 @@ export function Footer() {
         {COLS.map((c) => (
           <div key={c.title}>
             <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">{c.title}</p>
-            {/* Hover: the hovered link goes yellow + bold, its siblings recede to 80% */}
-            <ul className="group/links space-y-2.5 text-sm">
+            {/* Hover: the hovered link turns yellow, every other footer link recedes */}
+            <ul className="space-y-2.5 text-sm">
               {c.links.map((l) => (
                 <li key={l}>
                   <Link
                     href={c.title === "Brands" ? `/collections/${slug(l)}` : `/pages/${slug(l)}`}
-                    className="text-white transition-[opacity,color] duration-150 group-hover/links:opacity-80 hover:!opacity-100 hover:font-bold hover:text-jd-yellow focus-visible:font-bold focus-visible:text-jd-yellow"
+                    className="text-white transition-[opacity,color] duration-200 hover:text-jd-yellow focus-visible:text-jd-yellow"
                   >
                     {l}
                   </Link>

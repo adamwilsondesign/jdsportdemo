@@ -42,6 +42,11 @@ node scripts/build-catalog.mjs --fetch   # refresh from jdsports.ca, then rebuil
 
 The catalog has **258 products** (New Arrivals plus a curated set of 44 sale items). Campaign art lives in `public/campaign/` (webp).
 
+### Brand assets
+
+- `public/brand-logos/`: brand marks taken from JD Canada's own brands page (`jdsports.ca/pages/brands`), tight-cropped so they size consistently. The Reebok mark comes from Simple Icons (CC0). EA7, HOKA and Sonneti have no mark yet and fall back to text.
+- `public/brand-cutouts/`: six hero shoes for the Shop by Brand stage. They were cut from JD's product photos with a one-off background-removal pass (rembg), which is not part of the build.
+
 ### Demo data (not public on jdsports.ca)
 
 - **Per-variant inventory quantities.** Availability is real; quantities are generated deterministically, so low-stock messaging is consistent.

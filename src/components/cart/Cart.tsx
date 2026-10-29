@@ -7,7 +7,7 @@ import { FREE_SHIPPING_THRESHOLD, LOW_STOCK_THRESHOLD, RETURNS_SUMMARY, formatMo
 import { toMerchandise } from "@/lib/merch";
 import { useStore } from "@/components/providers/StoreProvider";
 import { Overlay } from "@/components/ui/Overlay";
-import { BagIcon, CheckIcon, ChevronDown, CloseIcon, EditIcon, HeartIcon, InfoIcon, MinusIcon, PlusIcon, ReturnIcon, TruckIcon } from "@/components/ui/Icons";
+import { BagIcon, CheckIcon, CloseIcon, EditIcon, HeartIcon, InfoIcon, MinusIcon, PlusIcon, ReturnIcon, TrashIcon, TruckIcon } from "@/components/ui/Icons";
 import { PaymentIcons } from "@/components/ui/PaymentIcons";
 import { Price } from "@/components/product/bits";
 
@@ -111,12 +111,12 @@ function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
                 <PlusIcon size={14} />
               </button>
             </div>
-            <div className="flex items-center gap-3 text-[12px] font-semibold">
-              <button type="button" onClick={() => saveForLater(line.id)} className="inline-flex items-center gap-1 text-muted hover:text-ink">
-                <HeartIcon size={14} /> Save<span className="hidden sm:inline"> for later</span>
+            <div className="-mr-2 flex items-center">
+              <button type="button" onClick={() => saveForLater(line.id)} aria-label={`Save ${label} for later`} title="Save for later" className="grid h-9 w-9 place-items-center text-muted transition-colors hover:text-sale">
+                <HeartIcon size={17} />
               </button>
-              <button type="button" onClick={() => removeLine(line.id)} className="text-muted underline underline-offset-2 hover:text-ink">
-                Remove
+              <button type="button" onClick={() => removeLine(line.id)} aria-label={`Remove ${label}`} title="Remove" className="grid h-9 w-9 place-items-center text-muted transition-colors hover:text-ink">
+                <TrashIcon size={17} />
               </button>
             </div>
           </div>
@@ -303,9 +303,8 @@ export function CartSummary({ onCheckout, compact }: { onCheckout?: () => void; 
 // ---------------------------------------------------------------------------
 // Complete the look — compact, collapsible, genuinely complementary (brief §6.C.1)
 // ---------------------------------------------------------------------------
-function CompleteTheLook({ handle, defaultOpen }: { handle: string; defaultOpen: boolean }) {
+function CompleteTheLook({ handle }: { handle: string }) {
   const [items, setItems] = useState<CardProduct[] | null>(null);
-  const [open, setOpen] = useState(defaultOpen);
   const { addToCart, lines } = useStore();
   const [added, setAdded] = useState<string | null>(null);
   useEffect(() => {
@@ -318,29 +317,23 @@ function CompleteTheLook({ handle, defaultOpen }: { handle: string; defaultOpen:
   const list = (items ?? []).filter((p) => !inCart.has(p.handle));
   if (items && !list.length) return null;
   return (
-    <div className="border-t border-line pt-4">
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center justify-between py-1 text-left">
-        <span className="t-eyebrow">Complete the look</span>
-        <ChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <ul className="mt-3 space-y-3">
-          {!items
-            ? [0, 1].map((i) => <li key={i} className="skeleton h-16" />)
-            : list.map((p) => {
-                const v = p.variants.find((x) => x.available && (x.title === "M" || x.title === "10" || x.title === "One Size")) ?? p.variants.find((x) => x.available);
-                return (
-                  <li key={p.handle} className="flex items-center gap-3">
-                    <Link href={`/products/${p.handle}`} className="h-16 w-16 shrink-0 bg-image">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={shopifyImage(p.image, 160)} alt="" className="h-full w-full object-cover" />
-                    </Link>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[12.5px] font-semibold">
-                        {p.brand} {p.model}
-                      </p>
-                      <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
-                    </div>
+    <section aria-label="Complete the look" className="border-t border-line pt-5">
+      <h3 className="text-[13px] font-bold">Complete the look</h3>
+      <ul className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto overflow-y-hidden px-5">
+        {!items
+          ? [0, 1, 2].map((i) => <li key={i} className="skeleton h-[196px] w-[132px] shrink-0" />)
+          : list.map((p) => {
+              const v = p.variants.find((x) => x.available && (x.title === "M" || x.title === "10" || x.title === "One Size")) ?? p.variants.find((x) => x.available);
+              const done = added === p.handle;
+              return (
+                <li key={p.handle} className="w-[132px] shrink-0">
+                  <Link href={`/products/${p.handle}`} className="block aspect-square overflow-hidden bg-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={shopifyImage(p.image, 280)} alt="" className="h-full w-full object-cover" />
+                  </Link>
+                  <p className="mt-2 truncate text-[12px] font-semibold">{p.model}</p>
+                  <div className="mt-0.5 flex items-center justify-between gap-1">
+                    <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
                     {v && (
                       <button
                         type="button"
@@ -348,18 +341,19 @@ function CompleteTheLook({ handle, defaultOpen }: { handle: string; defaultOpen:
                           addToCart(toMerchandise(p, p, v), 1, { openDrawer: false });
                           setAdded(p.handle);
                         }}
-                        className="btn btn-outline h-9 min-h-0 px-3 text-[12px]"
                         aria-label={`Add ${p.brand} ${p.model}, size ${v.title}`}
+                        title={`Add size ${v.title}`}
+                        className={`grid h-8 w-8 shrink-0 place-items-center border transition-colors ${done ? "border-success bg-success text-white" : "border-ink hover:bg-ink hover:text-white"}`}
                       >
-                        {added === p.handle ? <CheckIcon size={14} /> : `Add · ${v.title}`}
+                        {done ? <CheckIcon size={14} /> : <PlusIcon size={14} />}
                       </button>
                     )}
-                  </li>
-                );
-              })}
-        </ul>
-      )}
-    </div>
+                  </div>
+                </li>
+              );
+            })}
+      </ul>
+    </section>
   );
 }
 
@@ -413,19 +407,11 @@ export function CartDrawer() {
               ))}
             </ul>
             <div className="pb-5">
-              <CompleteTheLook handle={lines[0].merchandise.product.handle} defaultOpen={false} />
+              <CompleteTheLook handle={lines[0].merchandise.product.handle} />
             </div>
           </div>
           <div className="shrink-0 border-t border-line bg-white px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)]">
             <CartSummary onCheckout={close} compact />
-            <div className="mt-2 flex justify-center gap-4 text-[12.5px] font-semibold">
-              <button type="button" onClick={close} className="link-underline">
-                Continue shopping
-              </button>
-              <Link href="/cart" onClick={close} className="link-underline">
-                View full cart
-              </Link>
-            </div>
           </div>
         </>
       )}
@@ -459,7 +445,7 @@ export function CartPageView() {
             <h2 className="t-eyebrow mb-4">Order summary</h2>
             <CartSummary />
             <div className="mt-6">
-              <CompleteTheLook handle={lines[0].merchandise.product.handle} defaultOpen />
+              <CompleteTheLook handle={lines[0].merchandise.product.handle} />
             </div>
           </aside>
         </div>

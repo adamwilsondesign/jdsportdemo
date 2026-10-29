@@ -42,7 +42,21 @@ export function CollectionView({
   const filters = useMemo(() => parseFilters(new URLSearchParams(sp.toString())), [sp]);
   const sort = (sp.get("sort_by") as SortKey) || defaultSort;
   const page = Math.max(1, Number(sp.get("page")) || 1);
-  const [sidebar, setSidebar] = useState(true);
+  // Filters start hidden; the grid gets the full width until the shopper asks for them
+  const [sidebar, setSidebar] = useState(false);
+  const [density, setDensity] = useState<"compact" | "large">("compact");
+  useEffect(() => {
+    try {
+      const d = localStorage.getItem("jd.plp-density");
+      if (d === "large" || d === "compact") setDensity(d);
+    } catch {}
+  }, []);
+  const chooseDensity = (d: "compact" | "large") => {
+    setDensity(d);
+    try {
+      localStorage.setItem("jd.plp-density", d);
+    } catch {}
+  };
   const [sheet, setSheet] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -191,7 +205,7 @@ export function CollectionView({
     }
     slots.push(
       <li key={p.handle}>
-        <ProductCard product={p} priority={i < 3} sizes={sidebar ? "(min-width:768px) 28vw, 48vw" : "(min-width:1024px) 23vw, (min-width:768px) 31vw, 48vw"} />
+        <ProductCard product={p} priority={i < 3} sizes={density === "large" ? "(min-width:640px) 48vw, 100vw" : sidebar ? "(min-width:768px) 28vw, 48vw" : "(min-width:1024px) 23vw, (min-width:768px) 31vw, 48vw"} />
       </li>,
     );
     slot++;
@@ -256,7 +270,22 @@ export function CollectionView({
               ))}
             </div>
           )}
-          <label className="ml-auto hidden shrink-0 items-center gap-2 text-[13px] lg:flex">
+          <div role="radiogroup" aria-label="Grid size" className="ml-auto flex shrink-0 items-center gap-0.5 lg:ml-4">
+            {(["compact", "large"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                role="radio"
+                aria-checked={density === d}
+                aria-label={d === "compact" ? "Compact grid" : "Large grid"}
+                onClick={() => chooseDensity(d)}
+                className={`grid h-9 w-9 place-items-center transition-colors ${density === d ? "text-ink" : "text-subtle hover:text-ink"}`}
+              >
+                <DensityIcon cols={d === "compact" ? 4 : 2} active={density === d} />
+              </button>
+            ))}
+          </div>
+          <label className="hidden shrink-0 items-center gap-2 text-[13px] lg:flex">
             <span className="text-muted">Sort by</span>
             <span className="relative">
               <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="h-10 appearance-none border border-line bg-white pl-3 pr-9 text-[13px] font-semibold outline-none hover:border-ink focus-visible:border-ink">
@@ -286,7 +315,11 @@ export function CollectionView({
             <NoResults chips={chips} onRemove={toggle} onClear={clearAll} />
           ) : (
             <>
-              <ul className={`grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-4 md:grid-cols-3 md:gap-y-12 ${sidebar ? "" : "lg:grid-cols-4"} transition-opacity ${busy ? "opacity-50" : ""}`}>
+              <ul
+                className={`grid gap-x-3 gap-y-10 sm:gap-x-4 md:gap-y-12 ${
+                  density === "large" ? "grid-cols-1 sm:grid-cols-2 md:gap-x-6" : `grid-cols-2 md:grid-cols-3 ${sidebar ? "" : "lg:grid-cols-4"}`
+                } transition-opacity duration-300 ${busy ? "opacity-50" : ""}`}
+              >
                 {slots.map((s, i) => (
                   <Fragment key={i}>{s}</Fragment>
                 ))}
@@ -360,8 +393,8 @@ export function CollectionView({
 
 function PromoTile({ promo }: { promo: PromoCard }) {
   return (
-    <li className="col-span-2 md:col-span-1">
-      <Link href={promo.href} className="group relative flex h-[240px] flex-col justify-end overflow-hidden bg-ink p-5 text-white md:h-full md:min-h-[240px]">
+    <li className="col-span-full sm:col-span-1">
+      <div className="relative flex h-[260px] flex-col justify-end overflow-hidden bg-ink p-5 text-white sm:h-full sm:min-h-[260px]">
         {promo.image && (
           <>
             <Image src={promo.image} alt="" fill sizes="(min-width:768px) 30vw, 100vw" className="object-cover" />
@@ -370,10 +403,11 @@ function PromoTile({ promo }: { promo: PromoCard }) {
         )}
         <div className="relative">
           <p className="t-h2">{promo.title}</p>
-          <p className="mt-3 inline-flex items-center gap-1 text-[13px] font-bold underline underline-offset-4">{promo.cta} →</p>
+          <Link href={promo.href} className="btn btn-yellow mt-4 h-10 min-h-0 px-4 text-[13px]">
+            {promo.cta}
+          </Link>
         </div>
-        <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
-      </Link>
+      </div>
     </li>
   );
 }
@@ -381,19 +415,31 @@ function PromoTile({ promo }: { promo: PromoCard }) {
 function PromoBannerRow({ banner }: { banner: PromoBanner }) {
   return (
     <li className="col-span-full">
-      <Link href={banner.href} className="group relative flex aspect-[4/5] items-end overflow-hidden bg-ink text-white sm:aspect-[2400/950]">
-        <Image src={banner.image} alt="" fill sizes="(min-width:1024px) 75vw, 100vw" className="object-cover" />
+      <div className="relative flex aspect-[4/5] items-end overflow-hidden bg-ink text-white sm:aspect-[2400/950]">
+        <Image src={banner.image} alt="" fill sizes="(min-width:1024px) 90vw, 100vw" className="object-cover" />
         <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden />
         <div className="relative flex w-full flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-10">
           <div className="max-w-lg">
             <p className="t-h2">{banner.title}</p>
             <p className="mt-2 text-[14px] text-white/85">{banner.copy}</p>
           </div>
-          <span className="btn btn-yellow h-11 min-h-0 self-start md:self-auto">{banner.cta}</span>
+          <Link href={banner.href} className="btn btn-yellow h-11 min-h-0 self-start md:self-auto">
+            {banner.cta}
+          </Link>
         </div>
-        <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
-      </Link>
+      </div>
     </li>
+  );
+}
+
+function DensityIcon({ cols, active }: { cols: 2 | 4; active: boolean }) {
+  const cells = cols === 4 ? [0, 1, 2, 3].flatMap((x) => [0, 1].map((y) => ({ x: 2 + x * 5, y: 4 + y * 8, w: 3.5, h: 6.5 }))) : [0, 1].map((x) => ({ x: 3 + x * 9.5, y: 4, w: 8, h: 14.5 }));
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden>
+      {cells.map((c, i) => (
+        <rect key={i} x={c.x} y={c.y} width={c.w} height={c.h} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.2" />
+      ))}
+    </svg>
   );
 }
 

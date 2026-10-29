@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllProducts, getCompleteTheLook, getProduct, getSiblings, toCard } from "@/lib/storefront";
+import { getAllProducts, getCompleteTheLook, getColourFamily, getProduct, toCard } from "@/lib/storefront";
 
 export const dynamic = "force-static";
 
@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ handle:
   if (!p) return NextResponse.json({ error: "not found" }, { status: 404 });
   return NextResponse.json({
     card: toCard(p),
-    siblings: [p, ...getSiblings(p)].map(toCard),
+    siblings: getColourFamily(p).map(toCard),
     completeTheLook: getCompleteTheLook(p, 3).map(toCard),
   });
 }

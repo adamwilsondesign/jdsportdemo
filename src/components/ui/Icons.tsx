@@ -121,3 +121,6 @@ export const FeatherIcon = (p: P) => (
 export const LayersIcon = (p: P) => (
   <svg {...base(p)}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
 );
+export const TrashIcon = (p: P) => (
+  <svg {...base(p)}><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+);

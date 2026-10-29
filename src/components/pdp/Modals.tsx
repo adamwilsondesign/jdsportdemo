@@ -366,34 +366,50 @@ export function Lightbox({ open, onClose, images, start, alt }: { open: boolean;
     return () => window.removeEventListener("keydown", k);
   }, [open, images.length]);
   return (
-    <Overlay open={open} onClose={onClose} side="center" label="Product images" className="!h-[92dvh] !max-h-[92dvh] !max-w-[min(1100px,96vw)]">
-      <div className="flex h-12 shrink-0 items-center justify-between px-4">
-        <p className="text-[13px] font-semibold tabular-nums">
-          {i + 1} / {images.length}
-        </p>
-        <button type="button" onClick={onClose} aria-label="Close images" className="-mr-2 grid h-11 w-11 place-items-center">
-          <CloseIcon />
-        </button>
-      </div>
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-image">
-        <button type="button" onClick={() => setZoom((z) => !z)} aria-label={zoom ? "Zoom out" : "Zoom in"} className={`absolute inset-0 ${zoom ? "cursor-zoom-out overflow-auto" : "cursor-zoom-in"}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={shopifyImage(images[i], zoom ? 2048 : 1400)} alt={`${alt} — image ${i + 1}`} className={`mx-auto h-full object-contain transition-transform duration-300 ${zoom ? "scale-[1.8]" : ""}`} />
-        </button>
-        <button type="button" onClick={() => setI((n) => (n - 1 + images.length) % images.length)} aria-label="Previous image" className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center bg-white shadow">
-          <ChevronLeft />
-        </button>
-        <button type="button" onClick={() => setI((n) => (n + 1) % images.length)} aria-label="Next image" className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center bg-white shadow">
-          <ChevronRight />
-        </button>
-      </div>
-      <div className="no-scrollbar flex shrink-0 gap-2 overflow-x-auto p-3">
-        {images.map((src, k) => (
-          <button key={src} type="button" onClick={() => setI(k)} aria-label={`Image ${k + 1}`} aria-current={k === i} className={`h-16 w-16 shrink-0 bg-image ${k === i ? "ring-2 ring-ink" : "opacity-70 hover:opacity-100"}`}>
+    <Overlay
+      open={open}
+      onClose={onClose}
+      side="center"
+      label="Product images"
+      backdrop="blur"
+      className="!h-[92dvh] !max-h-[92dvh] !w-[min(1240px,96vw)] !max-w-none !bg-transparent !shadow-none"
+    >
+      <div className="flex h-full gap-4">
+        {/* thumbnails run up the side */}
+        <ul className="no-scrollbar hidden w-[72px] shrink-0 flex-col gap-2 overflow-y-auto md:flex">
+          {images.map((src, k) => (
+            <li key={src}>
+              <button
+                type="button"
+                onClick={() => {
+                  setI(k);
+                  setZoom(false);
+                }}
+                aria-label={`Image ${k + 1}`}
+                aria-current={k === i}
+                className={`block aspect-square w-full bg-image transition-opacity duration-200 ${k === i ? "opacity-100" : "opacity-45 hover:opacity-80"}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={shopifyImage(src, 160)} alt="" className="h-full w-full object-cover" />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="relative mx-auto aspect-square max-h-full min-w-0 max-w-full flex-1 overflow-hidden bg-image shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)] md:flex-none md:h-full">
+          <button type="button" onClick={() => setZoom((z) => !z)} aria-label={zoom ? "Zoom out" : "Zoom in"} className={`absolute inset-0 ${zoom ? "cursor-zoom-out overflow-auto" : "cursor-zoom-in"}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={shopifyImage(src, 160)} alt="" className="h-full w-full object-cover" />
+            <img key={images[i]} src={shopifyImage(images[i], zoom ? 2048 : 1400)} alt={`${alt} — image ${i + 1}`} className={`mx-auto h-full animate-fade-in object-contain transition-transform duration-500 ease-[var(--ease-out-soft)] ${zoom ? "scale-[1.8]" : ""}`} />
           </button>
-        ))}
+          <button type="button" onClick={onClose} aria-label="Close images" className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow-md transition-transform duration-300 hover:rotate-90">
+            <CloseIcon />
+          </button>
+          <button type="button" onClick={() => setI((n) => (n - 1 + images.length) % images.length)} aria-label="Previous image" className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-md transition-colors hover:bg-ink hover:text-white">
+            <ChevronLeft />
+          </button>
+          <button type="button" onClick={() => setI((n) => (n + 1) % images.length)} aria-label="Next image" className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-md transition-colors hover:bg-ink hover:text-white">
+            <ChevronRight />
+          </button>
+        </div>
       </div>
     </Overlay>
   );

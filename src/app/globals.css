@@ -50,6 +50,31 @@
   }
 }
 
+@keyframes underline-redraw {
+  0% { background-size: 100% 1px; background-position: 100% 100%; }
+  45% { background-size: 0% 1px; background-position: 100% 100%; }
+  46% { background-position: 0 100%; }
+  100% { background-size: 100% 1px; background-position: 0 100%; }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qb-in {
+  from { opacity: 0; transform: scale(0.92) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bag-bump {
+  0% { transform: scale(1) rotate(0); }
+  30% { transform: scale(1.22) rotate(-8deg); }
+  55% { transform: scale(0.94) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes bag-ring {
+  from { transform: scale(0.6); opacity: 0.9; }
+  to { transform: scale(2.1); opacity: 0; }
+}
+
 /* ---------- Type scale (documented in README) ---------- */
 @layer components {
   .t-display {
@@ -132,22 +157,55 @@
   }
   .btn:active:not(:disabled) { transform: scale(0.985); }
   .btn:disabled { cursor: not-allowed; }
-  .btn-primary { background: var(--color-ink); color: #fff; }
-  .btn-primary:hover:not(:disabled) { background: #2b2b2b; }
-  .btn-primary:disabled { background: #bdbdbd; color: #fff; }
-  .btn-yellow { background: var(--color-jd-yellow); color: var(--color-ink); }
-  .btn-yellow:hover:not(:disabled) { background: var(--color-jd-yellow-deep); }
-  .btn-outline { border: 1px solid var(--color-ink); color: var(--color-ink); background: #fff; }
-  .btn-outline:hover:not(:disabled) { background: var(--color-ink); color: #fff; }
-  .btn-ghost-light { border: 1px solid rgba(255, 255, 255, 0.85); color: #fff; }
-  .btn-ghost-light:hover { background: #fff; color: var(--color-ink); }
-
-  .link-underline {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
+  /* Hover = a confident left-to-right colour wipe, not a subtle tint */
+  .btn-primary,
+  .btn-yellow,
+  .btn-outline,
+  .btn-ghost-light {
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 0% 100%;
+    transition: background-size 320ms var(--ease-out-soft), color 200ms, border-color 200ms, transform 120ms;
   }
-  .link-underline:hover { text-decoration-thickness: 2px; }
+  .btn-primary:hover:not(:disabled),
+  .btn-yellow:hover:not(:disabled),
+  .btn-outline:hover:not(:disabled),
+  .btn-ghost-light:hover:not(:disabled),
+  .btn-primary:focus-visible,
+  .btn-yellow:focus-visible {
+    background-size: 100% 100%;
+  }
+  .btn-primary { background-color: var(--color-ink); background-image: linear-gradient(var(--color-jd-yellow), var(--color-jd-yellow)); color: #fff; }
+  .btn-primary:hover:not(:disabled) { color: var(--color-ink); }
+  .btn-primary:disabled { background-color: #bdbdbd; background-image: none; color: #fff; }
+  .btn-yellow { background-color: var(--color-jd-yellow); background-image: linear-gradient(#fff, #fff); color: var(--color-ink); }
+  .btn-outline { border: 1px solid var(--color-ink); color: var(--color-ink); background-color: #fff; background-image: linear-gradient(var(--color-ink), var(--color-ink)); }
+  .btn-outline:hover:not(:disabled) { color: #fff; }
+  .btn-ghost-light { border: 1px solid rgba(255, 255, 255, 0.85); color: #fff; background-image: linear-gradient(#fff, #fff); }
+  .btn-ghost-light:hover { color: var(--color-ink); border-color: #fff; }
+
+  /* Animated underline: retracts and redraws on hover */
+  .link-underline {
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: 2px;
+    transition: background-size 380ms var(--ease-out-soft);
+  }
+  .link-underline:hover {
+    animation: underline-redraw 520ms var(--ease-out-soft);
+  }
+
+  /* Gentle fade-up as sections scroll into view (progressive enhancement) */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 28%;
+    }
+  }
 
   .skeleton {
     background: linear-gradient(90deg, #eee 25%, #f6f6f6 37%, #eee 63%);

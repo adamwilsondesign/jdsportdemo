@@ -10,7 +10,7 @@ import { STORES, stockUpdatedMinutesAgo, storeStock } from "@/lib/stores";
 import { useStore } from "@/components/providers/StoreProvider";
 import { Badge, FavouriteButton, Price, Stars } from "@/components/product/bits";
 import { BellIcon, CheckIcon, ChevronDown, ChevronLeft, ChevronRight, InfoIcon, PinIcon, ReturnIcon, RulerIcon, TruckIcon } from "@/components/ui/Icons";
-import { BRAND_LOGOS, BrandLogo } from "@/components/ui/BrandLogo";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { FitFinder, Lightbox, NotifyMe, SizeGuide, StorePicker } from "./Modals";
 
 export type SiblingLite = { handle: string; colourway: string; image: string; sizes: { title: string; available: boolean }[] };
@@ -140,6 +140,11 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
       <div className="container-jd grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(380px,1fr)] lg:gap-12 xl:gap-16">
         {/* ---------------- Gallery ---------------- */}
         <section aria-label={`${label} images`} className="relative lg:sticky lg:top-[88px] lg:self-start">
+          {pct > 0 && (
+            <span className="pointer-events-none absolute right-3 top-3 z-10 lg:right-4 lg:top-4">
+              <Badge kind="sale" label={`−${pct}%`} />
+            </span>
+          )}
           <MobileGallery images={images} alt={label} onOpen={setLightbox} />
           <DesktopGallery images={images} alt={`${label}, ${product.colourway}`} onOpen={setLightbox} />
         </section>
@@ -148,7 +153,7 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
         <section aria-label="Product details and purchase" className="min-w-0 lg:pt-1">
           <div className="flex items-start justify-between gap-4">
             <Link href={`/collections/${slugify(product.brand)}`} className="inline-block text-ink hover:opacity-70" aria-label={`More from ${product.brand}`}>
-              {BRAND_LOGOS[product.brand] ? <BrandLogo brand={product.brand} className="h-9 w-9" /> : <span className="text-[12px] font-extrabold uppercase tracking-[0.08em]">{product.brand}</span>}
+              <BrandLogo brand={product.brand} size={40} className="text-[13px] tracking-[0.06em]" />
             </Link>
             {product.reviews && (
               <a href="#reviews" className="flex items-center gap-1.5 text-[12.5px] font-semibold hover:underline">
@@ -159,20 +164,15 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
           </div>
           <h1 className="mt-3 text-[26px] font-bold leading-[1.1] tracking-tight md:text-[30px]">{product.model}</h1>
           <p className="mt-1 text-[14px] text-muted">{product.colourway}</p>
-          {(pct > 0 || product.exclusive) && (
-            <p className="mt-2 flex flex-wrap items-center gap-2 text-[12.5px]">
-              {pct > 0 && <Badge kind="sale" label={`−${pct}%`} />}
-              {product.exclusive && (
-                <span>
-                  <b>Only at JD</b> <span className="text-muted">— exclusive colourway</span>
-                </span>
-              )}
+          {product.exclusive && (
+            <p className="mt-2 text-[12.5px]">
+              <b>Only at JD</b> <span className="text-muted">— exclusive colourway</span>
             </p>
           )}
 
           {/* Colour */}
           {siblings.length > 1 && (
-            <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Colours">
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Colours">
               {siblings.map((s) => {
                 const soldOut = !s.sizes.some((z) => z.available);
                 const current = s.handle === product.handle;
@@ -184,10 +184,10 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
                       aria-current={current}
                       aria-label={`${s.colourway}${soldOut ? " (sold out)" : ""}`}
                       title={s.colourway}
-                      className={`relative block h-14 w-14 overflow-hidden bg-image ${current ? "ring-2 ring-ink ring-offset-1" : "ring-1 ring-line hover:ring-ink"}`}
+                      className={`relative block h-[76px] w-[76px] overflow-hidden bg-image transition-shadow duration-200 ${current ? "ring-2 ring-ink ring-offset-2" : "ring-1 ring-line hover:ring-ink"}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={shopifyImage(s.image, 140)} alt="" className={`h-full w-full object-cover ${soldOut ? "opacity-40" : ""}`} />
+                      <img src={shopifyImage(s.image, 200)} alt="" className={`h-full w-full object-cover ${soldOut ? "opacity-40" : ""}`} />
                     </Link>
                   </li>
                 );
@@ -422,12 +422,10 @@ function DesktopGallery({ images, alt, onOpen }: { images: string[]; alt: string
           <li key={src}>
             <button
               type="button"
-              onMouseEnter={() => setI(k)}
-              onFocus={() => setI(k)}
               onClick={() => setI(k)}
               aria-label={`Show image ${k + 1} of ${images.length}`}
               aria-current={k === i}
-              className={`block aspect-square w-full overflow-hidden bg-image ${k === i ? "ring-1 ring-ink" : "opacity-70 hover:opacity-100"}`}
+              className={`block aspect-square w-full overflow-hidden bg-image transition-opacity duration-200 ${k === i ? "opacity-100" : "opacity-45 hover:opacity-80"}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={shopifyImage(src, 160)} alt="" className="h-full w-full object-cover" />
@@ -439,12 +437,13 @@ function DesktopGallery({ images, alt, onOpen }: { images: string[]; alt: string
         <button type="button" onClick={() => onOpen(i)} className="block w-full cursor-zoom-in bg-image" aria-label={`Zoom image ${i + 1} of ${images.length}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            key={images[i]}
             src={shopifyImage(images[i], 1200)}
             srcSet={shopifySrcSet(images[i], [800, 1200, 1600, 2048])}
             sizes="(min-width:1280px) 50vw, 55vw"
             alt={`${alt} — view ${i + 1}`}
             fetchPriority={i === 0 ? "high" : "auto"}
-            className="mx-auto aspect-square max-h-[min(calc(100dvh-120px),720px)] w-full object-contain"
+            className="mx-auto aspect-square max-h-[min(calc(100dvh-120px),720px)] w-full animate-fade-in object-contain"
           />
         </button>
         <div className="absolute bottom-3 right-3 flex gap-1.5">

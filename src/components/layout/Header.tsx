@@ -38,6 +38,15 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
   };
 
   const count = hydrated ? totalQuantity : 0;
+
+  // "Added" moment on the bag: bump + yellow ring whenever the cart count goes up
+  const prevCount = useRef<number | null>(null);
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    if (!hydrated) return;
+    if (prevCount.current !== null && totalQuantity > prevCount.current) setBump((b) => b + 1);
+    prevCount.current = totalQuantity;
+  }, [totalQuantity, hydrated]);
   const active = NAV.find((n) => n.label === openMenu);
 
   return (
@@ -89,9 +98,12 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
               {hydrated && favourites.length > 0 && <span className="absolute right-1.5 top-2 h-2 w-2 rounded-full bg-jd-yellow" aria-hidden />}
             </Link>
             <button type="button" onClick={() => setCartOpen(true)} className="relative -mr-2 grid h-11 w-11 place-items-center" aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}>
-              <BagIcon />
+              <span key={`bag-${bump}`} className={`block ${bump ? "animate-[bag-bump_650ms_var(--ease-out-soft)]" : ""}`}>
+                <BagIcon />
+              </span>
+              {bump > 0 && <span key={`ring-${bump}`} className="pointer-events-none absolute inset-1.5 rounded-full border-2 border-jd-yellow opacity-0 animate-[bag-ring_750ms_ease-out]" aria-hidden />}
               <span
-                key={count}
+                key={`count-${count}`}
                 className={`absolute right-0.5 top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-jd-yellow px-1 text-[10.5px] font-bold text-ink tabular-nums ${count ? "animate-pop" : "opacity-0"}`}
                 aria-hidden
               >

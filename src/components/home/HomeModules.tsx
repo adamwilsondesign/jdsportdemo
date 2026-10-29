@@ -14,9 +14,10 @@ export type Hotspot = { x: number; y: number; product: CardProduct; label: strin
 export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: string; title: string; copy: string; hotspots: Hotspot[]; cta: { label: string; href: string } }) {
   const [active, setActive] = useState<number | null>(null);
   return (
-    <section aria-labelledby="look-title" className="py-12 md:py-20">
-      <div className="container-jd grid grid-cols-[minmax(0,1fr)] items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
-        <div className="relative aspect-[4/5] overflow-hidden bg-image">
+    <section aria-labelledby="look-title" className="reveal py-2">
+      {/* Same 2-up grid and gutter as the editorial pair above, so the two rows read as one grid */}
+      <div className="container-jd grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
+        <div className="relative aspect-[4/5] overflow-hidden bg-image md:aspect-[5/6]">
           <Image src={image} alt="Model wearing an UGG shearling moto jacket, balloon jeans and Tasman slippers" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
           {hotspots.map((h, i) => (
             <Link
@@ -40,7 +41,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
             </Link>
           ))}
         </div>
-        <div>
+        <div className="flex flex-col justify-center bg-surface p-6 md:p-10 lg:p-14">
           <h2 id="look-title" className="t-h1">
             {title}
           </h2>
@@ -48,7 +49,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
           <ol className="mt-8 divide-y divide-line border-y border-line">
             {hotspots.map((h, i) => (
               <li key={h.product.handle} onMouseEnter={() => setActive(i)} onMouseLeave={() => setActive(null)}>
-                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 py-3 transition-colors ${active === i ? "bg-surface" : ""}`}>
+                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 px-2 py-3 transition-colors ${active === i ? "bg-white" : ""}`}>
                   <span className="w-5 text-center text-[12px] font-bold tabular-nums text-muted">{i + 1}</span>
                   <span className="h-16 w-16 shrink-0 bg-image">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

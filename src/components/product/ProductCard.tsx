@@ -9,7 +9,7 @@ import { useStore } from "@/components/providers/StoreProvider";
 import { Badge, FavouriteButton, Price, ProductImage, pickBadge } from "./bits";
 import { BagIcon, CheckIcon, CloseIcon, PlusIcon, StarIcon } from "@/components/ui/Icons";
 import { Overlay } from "@/components/ui/Overlay";
-import { BRAND_LOGOS, BrandLogo } from "@/components/ui/BrandLogo";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { COLOUR_SWATCH } from "@/lib/filters";
 
 export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22vw, (min-width:768px) 30vw, 48vw" }: { product: CardProduct; priority?: boolean; sizes?: string }) {
@@ -27,51 +27,56 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
   return (
     <article className="relative flex flex-col">
       {/* Hover behaviour (alt image, Quick Buy) is scoped to the image only */}
-      <div className="group/img relative" onMouseLeave={() => setQuickOpen(false)}>
+      <div className="group/img relative overflow-hidden" onMouseLeave={() => setQuickOpen(false)}>
         <Link href={href} className="block" aria-label={`${label}, ${active.colourway}`}>
           <ProductImage src={active.image} alt={`${label} in ${active.colourway}`} sizes={sizes} priority={priority} />
           {active.hoverImage && (
-            // Alternate angle on hover (desktop only), swapped instantly — no cross-fade
+            // Alternate angle: preloaded off-screen-free (opacity 0), then a short cross-fade on hover
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={shopifyImage(active.hoverImage, 720)}
               alt=""
               aria-hidden
               loading="lazy"
-              className="pointer-events-none absolute inset-0 hidden h-full w-full bg-image object-cover md:group-hover/img:block"
+              decoding="async"
+              className="pointer-events-none absolute inset-0 hidden h-full w-full bg-image object-cover opacity-0 transition-opacity duration-300 ease-out md:block md:group-hover/img:opacity-100"
             />
           )}
         </Link>
 
-        <div className="pointer-events-none absolute left-2 top-2 flex flex-col items-start gap-1">
-          {badge && <Badge {...badge} />}
-          {stock && (
-            <span className="inline-flex h-6 items-center gap-1.5 bg-white px-2 text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink">
-              <span className="h-1.5 w-1.5 rounded-full bg-warn" aria-hidden />
-              {stock}
-            </span>
-          )}
-        </div>
+        {badge && (
+          <div className="pointer-events-none absolute left-2 top-2">
+            <Badge {...badge} />
+          </div>
+        )}
         <FavouriteButton handle={active.handle} label={label} className="absolute right-0 top-0 text-ink hover:text-sale" />
 
-        {/* Brand mark sits on the image instead of taking a text line */}
-        <span className={`pointer-events-none absolute bottom-3 left-3 text-ink transition-opacity ${quickOpen ? "opacity-0" : "md:group-hover/img:opacity-0"}`}>
-          <BrandLogo brand={product.brand} className={BRAND_LOGOS[product.brand] ? "h-7 w-7" : "text-[11px] tracking-[0.04em]"} />
+        {/* Bottom edge: brand mark left, stock signal right */}
+        <span className={`pointer-events-none absolute bottom-3 left-3 transition-opacity duration-200 ${quickOpen ? "opacity-0" : ""}`}>
+          <BrandLogo brand={product.brand} size={30} className="text-[11px] tracking-[0.04em]" />
         </span>
+        {stock && (
+          <span
+            className={`pointer-events-none absolute bottom-3 right-14 flex items-center gap-1.5 text-[11px] font-semibold text-ink transition-opacity duration-200 md:right-3 ${quickOpen ? "opacity-0" : "md:group-hover/img:opacity-0"}`}
+          >
+            <span className="h-2 w-2 rounded-full bg-warn sm:h-1.5 sm:w-1.5" aria-hidden />
+            <span className="sr-only sm:not-sr-only">{stock}</span>
+          </span>
+        )}
 
-        {/* Desktop quick buy */}
+        {/* Desktop quick buy: a square + that expands into the size menu */}
         {!soldOut && (
-          <div className="pointer-events-none absolute inset-2 hidden flex-col justify-end md:flex [&>*]:pointer-events-auto">
+          <div className="pointer-events-none absolute inset-2 hidden items-end justify-end md:flex [&>*]:pointer-events-auto">
             {quickOpen ? (
               <QuickBuyPanel product={product} swatch={active} onClose={() => setQuickOpen(false)} />
             ) : (
               <button
                 type="button"
                 onClick={() => setQuickOpen(true)}
-                className="btn h-10 min-h-0 w-full bg-white text-[13px] text-ink opacity-0 shadow-sm transition-opacity hover:bg-ink hover:text-white focus-visible:opacity-100 group-hover/img:opacity-100"
+                aria-label={`Quick buy ${label}`}
+                className="grid h-10 w-10 translate-y-1 place-items-center bg-white text-ink opacity-0 shadow-[0_4px_14px_rgba(0,0,0,0.12)] transition-[opacity,transform,background-color,color] duration-200 ease-out hover:bg-ink hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover/img:translate-y-0 group-hover/img:opacity-100"
               >
-                Quick Buy
-                <span className="sr-only"> {label}</span>
+                <PlusIcon size={18} />
               </button>
             )}
           </div>
@@ -82,7 +87,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
             type="button"
             onClick={() => setSheetOpen(true)}
             aria-label={`Quick buy ${label}`}
-            className="absolute bottom-2 right-2 grid h-10 w-10 place-items-center bg-white text-ink shadow-sm md:hidden"
+            className="absolute bottom-2 right-2 grid h-10 w-10 place-items-center bg-white text-ink shadow-sm active:scale-95 md:hidden"
           >
             <PlusIcon size={18} />
           </button>
@@ -90,24 +95,28 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
       </div>
 
       <div className="pt-3">
-        <Link href={href} className="block">
+        <Link href={href} className="group/title block">
           <span className="sr-only">{product.brand} </span>
-          <h3 className="truncate text-[14px] font-semibold leading-snug hover:underline hover:underline-offset-2" title={product.model}>
-            {product.model}
-          </h3>
-          <p className="mt-0.5 truncate text-[12.5px] text-muted">{active.colourway}</p>
-        </Link>
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <Price price={active.price} compareAt={active.compareAt} size="sm" showSaving={false} />
-          {product.reviews && (
-            <span className="flex shrink-0 items-center gap-1 text-[12px] font-semibold tabular-nums">
-              <StarIcon size={12} />
-              {product.reviews.rating.toFixed(1)}
-              <span className="font-normal text-muted">({product.reviews.count})</span>
-              <span className="sr-only"> out of 5, {product.reviews.count} reviews</span>
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 className="min-w-0 truncate text-[14px] font-semibold leading-snug decoration-1 underline-offset-2 group-hover/title:underline" title={product.model}>
+              {product.model}
+            </h3>
+            <span className="shrink-0">
+              <Price price={active.price} compareAt={active.compareAt} size="sm" showSaving={false} />
             </span>
-          )}
-        </div>
+          </div>
+          <div className="mt-0.5 flex items-baseline justify-between gap-3">
+            <p className="min-w-0 truncate text-[12.5px] text-muted">{active.colourway}</p>
+            {product.reviews && (
+              <span className="flex shrink-0 items-center gap-1 text-[12px] font-semibold tabular-nums">
+                <StarIcon size={11} />
+                {product.reviews.rating.toFixed(1)}
+                <span className="font-normal text-muted">({product.reviews.count})</span>
+                <span className="sr-only"> out of 5, {product.reviews.count} reviews</span>
+              </span>
+            )}
+          </div>
+        </Link>
         {swatches.length > 1 && (
           <div className="mt-2.5 flex items-center gap-2" role="group" aria-label={`${swatches.length} colours`}>
             {swatches.slice(0, 5).map((s) => (
@@ -118,7 +127,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
                 aria-label={`Show colour ${s.colourway}`}
                 aria-pressed={s.handle === activeHandle}
                 title={s.colourway}
-                className={`grid h-5 w-5 place-items-center rounded-full ${s.handle === activeHandle ? "ring-1 ring-ink ring-offset-2" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2"}`}
+                className={`grid h-5 w-5 place-items-center rounded-full transition-shadow ${s.handle === activeHandle ? "ring-1 ring-ink ring-offset-2" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2"}`}
               >
                 <span className="h-4 w-4 rounded-full border border-black/15" style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }} />
               </button>
@@ -183,9 +192,9 @@ function SizeButtons({ variants, onPick, pending }: { variants: CardVariant[]; o
 function QuickBuyPanel({ product, swatch, onClose }: { product: CardProduct; swatch: CardSwatch | CardProduct; onClose: () => void }) {
   const { add, added, pending, openCart } = useQuickAdd(product, swatch);
   if (added) {
-    // Entire confirmation card opens the cart (brief §6.C.5)
+    // Entire confirmation card opens the cart
     return (
-      <button type="button" onClick={openCart} className="flex w-full animate-rise items-center gap-3 bg-ink p-3 text-left text-white shadow-lg">
+      <button type="button" onClick={openCart} className="flex w-full origin-bottom-right animate-[qb-in_260ms_var(--ease-out-soft)_both] items-center gap-3 bg-ink p-3 text-left text-white shadow-lg">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-jd-yellow text-ink">
           <CheckIcon size={16} />
         </span>
@@ -197,17 +206,15 @@ function QuickBuyPanel({ product, swatch, onClose }: { product: CardProduct; swa
     );
   }
   return (
-    <div className="max-h-full animate-rise overflow-y-auto bg-white p-2.5 shadow-lg" role="group" aria-label="Select a size">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="t-eyebrow text-[10px]">Select size{product.category === "Footwear" ? ` · ${product.gender === "Women" ? "Women's" : "Men's"} US` : ""}</span>
-        <button type="button" onClick={onClose} aria-label="Close quick buy" className="-m-1 grid h-7 w-7 place-items-center text-muted hover:text-ink">
-          <CloseIcon size={14} />
-        </button>
+    <div className="relative max-h-full w-full origin-bottom-right animate-[qb-in_260ms_var(--ease-out-soft)_both] overflow-y-auto bg-white p-3 shadow-[0_10px_30px_rgba(0,0,0,0.16)]" role="group" aria-label="Select a size">
+      <div className="mb-2.5 flex items-center justify-between pr-8">
+        <span className="text-[12px] font-semibold">Select size{product.category === "Footwear" ? <span className="font-normal text-muted"> · {product.gender === "Women" ? "Women's" : "Men's"} US</span> : null}</span>
       </div>
+      {/* the + becomes the × in the panel's top-right corner */}
+      <button type="button" onClick={onClose} aria-label="Close quick buy" className="absolute right-1 top-1 grid h-9 w-9 place-items-center text-ink transition-transform duration-300 hover:rotate-90">
+        <CloseIcon size={16} />
+      </button>
       <SizeButtons variants={swatch.variants} onPick={add} pending={pending} />
-      <p className="mt-2 flex items-center gap-1.5 text-[10.5px] text-muted">
-        <span className="h-1.5 w-1.5 rounded-full bg-warn" aria-hidden /> 3 or fewer left
-      </p>
     </div>
   );
 }

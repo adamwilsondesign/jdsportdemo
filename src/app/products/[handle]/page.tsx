@@ -5,7 +5,7 @@ import { ProductView, type SiblingLite } from "@/components/pdp/ProductView";
 import { Reviews } from "@/components/pdp/Reviews";
 import { ProductRow } from "@/components/home/ProductRow";
 import { ProductCard } from "@/components/product/ProductCard";
-import { getAllProducts, getCompleteTheLook, getProduct, getRecommendations, getSiblings, toCard } from "@/lib/storefront";
+import { getAllProducts, getColourFamily, getCompleteTheLook, getProduct, getRecommendations, toCard } from "@/lib/storefront";
 
 export function generateStaticParams() {
   return getAllProducts().map((p) => ({ handle: p.handle }));
@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
   const product = getProduct(handle);
   if (!product) notFound();
 
-  const siblings: SiblingLite[] = [product, ...getSiblings(product)].map((s) => ({
+  const siblings: SiblingLite[] = getColourFamily(product).map((s) => ({
     handle: s.handle,
     colourway: s.colourway,
     image: s.featuredImage.url,
