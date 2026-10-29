@@ -132,6 +132,6 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 
 ## Notes and next steps
 
-- **Fonts:** JD's site uses licensed **Gotham**. This POC uses Montserrat, its closest free match, via `--font-brand`. Point that variable at self-hosted Gotham for production.
+- **Fonts:** JD's site uses licensed **Gotham**. This POC self-hosts Montserrat (OFL, `src/app/fonts/`), its closest free match, via `--font-brand`. Swap the file for JD's licensed Gotham in production.
 - Product images are hot-linked from JD's Shopify CDN. If JD removes a product, its images will 404 until the catalog is rebuilt.
 - Out of scope: Kids and Releases navigation (no catalog coverage), French locale, account and auth, real checkout.

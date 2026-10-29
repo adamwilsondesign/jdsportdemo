@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import { Header } from "@/components/layout/Header";
@@ -8,9 +8,17 @@ import { AnnouncementBar, CountryNotice, Toaster } from "@/components/layout/Chr
 import { CartDrawer } from "@/components/cart/Cart";
 import { BRANDS, getAllProducts } from "@/lib/storefront";
 
-// Montserrat is the closest freely-licensed match to JD's Gotham. Swap --font-brand to self-hosted
-// Gotham (JD's licensed web font) for production.
-const brandFont = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-brand", display: "swap" });
+// Montserrat (OFL, self-hosted variable font) is the closest freely-licensed match to JD's Gotham.
+// Self-hosting keeps builds free of a Google Fonts network dependency. Swap the file for JD's
+// licensed Gotham in production.
+const brandFont = localFont({
+  src: "./fonts/Montserrat-Variable-latin.woff2",
+  weight: "100 900",
+  style: "normal",
+  variable: "--font-brand",
+  display: "swap",
+  fallback: ["Helvetica Neue", "Arial", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: { default: "JD Sports Canada | Sneakers, Clothing & Accessories", template: "%s | JD Sports Canada" },
