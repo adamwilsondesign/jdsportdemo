@@ -9,7 +9,8 @@ import { SIZE_SYSTEMS, equivalents, isNumericSize, modelFit, sizeLabel } from "@
 import { STORES, stockUpdatedMinutesAgo, storeStock } from "@/lib/stores";
 import { useStore } from "@/components/providers/StoreProvider";
 import { Badge, FavouriteButton, Price, Stars } from "@/components/product/bits";
-import { BellIcon, CheckIcon, ChevronDown, InfoIcon, PinIcon, ReturnIcon, RulerIcon, TruckIcon, ZoomIcon } from "@/components/ui/Icons";
+import { BellIcon, CheckIcon, ChevronDown, ChevronLeft, ChevronRight, InfoIcon, PinIcon, ReturnIcon, RulerIcon, TruckIcon } from "@/components/ui/Icons";
+import { BRAND_LOGOS, BrandLogo } from "@/components/ui/BrandLogo";
 import { FitFinder, Lightbox, NotifyMe, SizeGuide, StorePicker } from "./Modals";
 
 export type SiblingLite = { handle: string; colourway: string; image: string; sizes: { title: string; available: boolean }[] };
@@ -136,150 +137,129 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
         </nav>
       </div>
 
-      <div className="container-jd grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(360px,1fr)] lg:gap-12 xl:gap-16">
+      <div className="container-jd grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(380px,1fr)] lg:gap-12 xl:gap-16">
         {/* ---------------- Gallery ---------------- */}
-        <section aria-label={`${label} images`} className="relative">
-          {/* mobile: swipeable with a clear position indicator */}
+        <section aria-label={`${label} images`} className="relative lg:sticky lg:top-[88px] lg:self-start">
           <MobileGallery images={images} alt={label} onOpen={setLightbox} />
-          {/* desktop: editorial 2-up grid, every image visible, click to zoom */}
-          <ul className="hidden grid-cols-2 gap-2 lg:grid">
-            {images.map((src, i) => (
-              <li key={src} className={i === 0 && images.length % 2 === 1 ? "col-span-2" : ""}>
-                <button type="button" onClick={() => setLightbox(i)} className="group relative block w-full cursor-zoom-in overflow-hidden bg-image" aria-label={`Zoom image ${i + 1} of ${images.length}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={shopifyImage(src, 1000)}
-                    srcSet={shopifySrcSet(src, [600, 900, 1200, 1600])}
-                    sizes={i === 0 && images.length % 2 === 1 ? "58vw" : "29vw"}
-                    alt={`${label}, ${product.colourway} — view ${i + 1}`}
-                    loading={i < 2 ? "eager" : "lazy"}
-                    fetchPriority={i === 0 ? "high" : "auto"}
-                    className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] ${i === 0 && images.length % 2 === 1 ? "aspect-[2/1.1]" : "aspect-square"}`}
-                  />
-                  <span className="absolute bottom-3 right-3 grid h-9 w-9 place-items-center bg-white/90 opacity-0 transition-opacity group-hover:opacity-100">
-                    <ZoomIcon size={16} />
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="t-meta mt-2 hidden lg:block">{images.length} images · click any image to zoom</p>
+          <DesktopGallery images={images} alt={`${label}, ${product.colourway}`} onOpen={setLightbox} />
         </section>
 
-        {/* ---------------- Buy box ---------------- */}
-        <section aria-label="Product details and purchase" className="lg:sticky lg:top-[88px] lg:self-start">
-          <div className="flex flex-wrap items-center gap-2">
-            {pct > 0 && <Badge kind="sale" label={`−${pct}%`} />}
-            {product.exclusive && (
-              <span className="group relative">
-                <Badge kind="exclusive" label="Only at JD" />
-                <span className="t-meta ml-2">Exclusive colourway — not sold by other Canadian retailers</span>
-              </span>
-            )}
-            {!product.exclusive && product.isNew && pct === 0 && <Badge kind="new" label="New arrival" />}
-          </div>
-
-          <Link href={`/collections/${slugify(product.brand)}`} className="t-eyebrow mt-4 inline-block text-muted hover:text-ink hover:underline">
-            {product.brand}
-          </Link>
-          <h1 className="mt-1 text-[26px] font-bold leading-[1.1] tracking-tight md:text-[32px]">{product.model}</h1>
-          <p className="mt-1.5 text-[14px] text-muted">{product.colourway}</p>
-
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+        {/* ---------------- Buy box: brand → name → size → price → CTA → details ---------------- */}
+        <section aria-label="Product details and purchase" className="min-w-0 lg:pt-1">
+          <div className="flex items-start justify-between gap-4">
+            <Link href={`/collections/${slugify(product.brand)}`} className="inline-block text-ink hover:opacity-70" aria-label={`More from ${product.brand}`}>
+              {BRAND_LOGOS[product.brand] ? <BrandLogo brand={product.brand} className="h-9 w-9" /> : <span className="text-[12px] font-extrabold uppercase tracking-[0.08em]">{product.brand}</span>}
+            </Link>
             {product.reviews && (
               <a href="#reviews" className="flex items-center gap-1.5 text-[12.5px] font-semibold hover:underline">
-                <Stars rating={product.reviews.rating} size={13} />
-                {product.reviews.rating.toFixed(1)} <span className="font-normal text-muted">({product.reviews.count} reviews)</span>
+                <Stars rating={product.reviews.rating} size={12} />
+                {product.reviews.rating.toFixed(1)} <span className="font-normal text-muted">({product.reviews.count})</span>
               </a>
             )}
           </div>
-
-          <div className="mt-4">
-            <Price price={price} compareAt={compareAt} size="lg" />
-            <p className="mt-1.5 text-[12.5px] text-muted">
-              or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((price / 4) * 100) / 100)}</b> with <b className="text-ink">Afterpay</b>
+          <h1 className="mt-3 text-[26px] font-bold leading-[1.1] tracking-tight md:text-[30px]">{product.model}</h1>
+          <p className="mt-1 text-[14px] text-muted">{product.colourway}</p>
+          {(pct > 0 || product.exclusive) && (
+            <p className="mt-2 flex flex-wrap items-center gap-2 text-[12.5px]">
+              {pct > 0 && <Badge kind="sale" label={`−${pct}%`} />}
+              {product.exclusive && (
+                <span>
+                  <b>Only at JD</b> <span className="text-muted">— exclusive colourway</span>
+                </span>
+              )}
             </p>
-          </div>
-
-          {/* Three decision-relevant benefits near the price (brief §5.B.3) */}
-          {benefits.length > 0 && (
-            <ul className="mt-5 space-y-1.5 border-y border-line py-4 text-[13.5px]">
-              {benefits.map((b) => (
-                <li key={b} className="flex gap-2.5">
-                  <CheckIcon size={16} className="mt-0.5 shrink-0" />
-                  {b}
-                </li>
-              ))}
-            </ul>
           )}
 
           {/* Colour */}
           {siblings.length > 1 && (
-            <div className="mt-5">
-              <p className="text-[13px] font-bold">
-                Colour: <span className="font-normal text-muted">{product.colourway}</span>
-              </p>
-              <ul className="mt-2.5 flex flex-wrap gap-2">
-                {siblings.map((s) => {
-                  const soldOut = !s.sizes.some((z) => z.available);
-                  const current = s.handle === product.handle;
-                  return (
-                    <li key={s.handle}>
-                      <Link
-                        href={`/products/${s.handle}${size ? `?size=${encodeURIComponent(size)}` : ""}`}
-                        scroll={false}
-                        aria-current={current}
-                        aria-label={`${s.colourway}${soldOut ? " (sold out)" : ""}`}
-                        title={s.colourway}
-                        className={`relative block h-[68px] w-[68px] overflow-hidden bg-image transition-shadow ${current ? "ring-2 ring-ink ring-offset-2" : "ring-1 ring-line hover:ring-ink"}`}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={shopifyImage(s.image, 160)} alt="" className={`h-full w-full object-cover ${soldOut ? "opacity-40" : ""}`} />
-                        {soldOut && <span className="absolute inset-x-0 bottom-0 bg-white/90 py-0.5 text-center text-[9px] font-bold uppercase">Sold out</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Colours">
+              {siblings.map((s) => {
+                const soldOut = !s.sizes.some((z) => z.available);
+                const current = s.handle === product.handle;
+                return (
+                  <li key={s.handle}>
+                    <Link
+                      href={`/products/${s.handle}${size ? `?size=${encodeURIComponent(size)}` : ""}`}
+                      scroll={false}
+                      aria-current={current}
+                      aria-label={`${s.colourway}${soldOut ? " (sold out)" : ""}`}
+                      title={s.colourway}
+                      className={`relative block h-14 w-14 overflow-hidden bg-image ${current ? "ring-2 ring-ink ring-offset-1" : "ring-1 ring-line hover:ring-ink"}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={shopifyImage(s.image, 140)} alt="" className={`h-full w-full object-cover ${soldOut ? "opacity-40" : ""}`} />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           )}
 
-          {/* Size */}
-          <div ref={sizesRef} className="mt-6 scroll-mt-32">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[13px] font-bold" id="size-label">
-                {footwear ? `Select size · ${product.gender === "Women" ? "Women's" : "Men's"} ${system}` : "Select size"}
-              </p>
-              {footwear && (
-                <div role="radiogroup" aria-label="Sizing system" className="flex bg-surface p-0.5">
-                  {SIZE_SYSTEMS.map((s) => (
-                    <button key={s} type="button" role="radio" aria-checked={system === s} onClick={() => setPrefs({ sizeSystem: s })} className={`h-7 px-2.5 text-[11px] font-bold ${system === s ? "bg-white shadow-sm" : "text-muted hover:text-ink"}`}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              )}
+          {/* Size — one compact, horizontally scrollable row */}
+          <div ref={sizesRef} className="mt-5 scroll-mt-32">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <p className="text-[13px] font-bold" id="size-label">
+                  Size{footwear && <span className="hidden sm:inline"> · {product.gender === "Women" ? "Women's" : "Men's"}</span>}
+                </p>
+                {footwear && (
+                  <div role="radiogroup" aria-label="Sizing system" className="flex">
+                    {SIZE_SYSTEMS.map((s) => (
+                      <button key={s} type="button" role="radio" aria-checked={system === s} onClick={() => setPrefs({ sizeSystem: s })} className={`h-6 px-1.5 text-[11px] font-bold ${system === s ? "text-ink underline underline-offset-4" : "text-subtle hover:text-ink"}`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex shrink-0 items-center gap-3 text-[12px] font-semibold">
+                {footwear && (
+                  <button type="button" onClick={() => setFitOpen(true)} className="flex items-center gap-1 underline underline-offset-4">
+                    <RulerIcon size={13} /> Find my size
+                  </button>
+                )}
+                <button type="button" onClick={() => setGuideOpen(true)} className="text-muted underline underline-offset-4 hover:text-ink">
+                  Size guide
+                </button>
+              </div>
             </div>
 
-            {/* fit cue + tools */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px]">
-              {footwear && (
-                <span className="flex items-center gap-1.5 text-muted">
-                  <InfoIcon size={14} /> {fit.note}
-                </span>
-              )}
-              {footwear && (
-                <button type="button" onClick={() => setFitOpen(true)} className="flex items-center gap-1 font-bold underline underline-offset-4">
-                  <RulerIcon size={14} /> Find my size
-                </button>
-              )}
-              <button type="button" onClick={() => setGuideOpen(true)} className="font-semibold text-muted underline underline-offset-4 hover:text-ink">
-                Size guide
-              </button>
+            <SizeRow
+              variants={product.variants}
+              selected={size}
+              anchor={footwear ? (product.gender === "Women" ? "6" : "8") : null}
+              label={(v) => sizeLabel(v.title, system, product.gender)}
+              alerts={prefs.alerts}
+              onPick={choose}
+              onSoldOut={setNotifyFor}
+              shake={error}
+            />
+
+            <div className="mt-2 min-h-[20px] text-[12.5px]" aria-live="polite">
+              {error && !variant ? (
+                <p className="font-semibold text-sale">Select a size to add this to your cart.</p>
+              ) : variant ? (
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                  {variant.quantityAvailable <= LOW_STOCK_THRESHOLD ? (
+                    <span className="font-bold text-warn">
+                      Only {variant.quantityAvailable} left in size {variant.title}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 font-semibold text-success">
+                      <CheckIcon size={13} /> In stock
+                    </span>
+                  )}
+                  {footwear && isNumericSize(variant.title) && <span className="text-muted">{equivalents(variant.title, product.gender)}</span>}
+                </p>
+              ) : footwear ? (
+                <p className="flex items-center gap-1.5 text-muted">
+                  <InfoIcon size={13} /> {fit.note}
+                </p>
+              ) : null}
             </div>
 
             {wanted && (
-              <div className="mt-3 animate-fade-in bg-surface p-3 text-[12.5px]" role="status">
+              <div className="mt-2 animate-fade-in bg-surface p-3 text-[12.5px]" role="status">
                 <p className="font-semibold">
                   Size {wanted} is sold out in {product.colourway}.
                 </p>
@@ -296,77 +276,20 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
                     ))}
                   </p>
                 ) : (
-                  <p className="mt-1 text-muted">Pick another size or set a restock alert below.</p>
+                  <p className="mt-1 text-muted">Pick another size or tap a sold-out size for a restock alert.</p>
                 )}
               </div>
             )}
-
-            <div role="radiogroup" aria-labelledby="size-label" className={`mt-3 grid gap-1.5 ${footwear ? "grid-cols-4 sm:grid-cols-5" : "grid-cols-4"} ${error ? "animate-[shake_0.35s]" : ""}`}>
-              {product.variants.map((v) => {
-                const selected = v.title === size;
-                const low = v.availableForSale && v.quantityAvailable <= LOW_STOCK_THRESHOLD;
-                const alert = prefs.alerts.includes(v.id);
-                if (!v.availableForSale)
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      onClick={() => setNotifyFor(v)}
-                      aria-label={`Size ${v.title} sold out — ${alert ? "restock alert set" : "get a restock alert"}`}
-                      className="relative flex h-12 flex-col items-center justify-center border border-dashed border-line-strong bg-surface text-[13px] text-subtle hover:border-ink hover:text-ink"
-                    >
-                      <span className="line-through decoration-1">{sizeLabel(v.title, system, product.gender)}</span>
-                      <span className="flex items-center gap-0.5 text-[9.5px] font-bold uppercase tracking-wide">
-                        <BellIcon size={10} /> {alert ? "Alert set" : "Notify"}
-                      </span>
-                    </button>
-                  );
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    onClick={() => choose(v)}
-                    aria-label={`Size ${sizeLabel(v.title, system, product.gender)}${low ? `, only ${v.quantityAvailable} left` : ""}`}
-                    className={`relative flex h-12 items-center justify-center border text-[13.5px] font-semibold tabular-nums transition-[background-color,border-color,color] duration-150 ${
-                      selected ? "border-ink bg-ink text-white" : "border-line bg-white hover:border-ink"
-                    }`}
-                  >
-                    {sizeLabel(v.title, system, product.gender)}
-                    {low && <span className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${selected ? "bg-jd-yellow" : "bg-warn"}`} aria-hidden />}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-warn" aria-hidden /> {LOW_STOCK_THRESHOLD} or fewer left
-              <span className="ml-3 inline-flex items-center gap-1">
-                <BellIcon size={11} /> Tap a sold-out size for a restock alert
-              </span>
-            </p>
-
-            {/* Factual, variant-level urgency only after selection (brief §5.A.3) + inline equivalents (§5.A.6) */}
-            <div className="mt-3 min-h-[22px] text-[13px]" aria-live="polite">
-              {error && !variant && <p className="font-semibold text-sale">Please select a size to add this to your cart.</p>}
-              {variant && (
-                <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  {variant.quantityAvailable <= LOW_STOCK_THRESHOLD ? (
-                    <span className="font-bold text-warn">
-                      Only {variant.quantityAvailable} left in size {variant.title}
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 font-semibold text-success">
-                      <CheckIcon size={14} /> In stock — ships in 1–2 business days
-                    </span>
-                  )}
-                  {footwear && isNumericSize(variant.title) && <span className="t-meta">US {variant.title} = {equivalents(variant.title, product.gender)}</span>}
-                </p>
-              )}
-            </div>
           </div>
 
-          {/* CTA */}
+          {/* Price, then the CTA directly beneath it */}
+          <div className="mt-4">
+            <Price price={price} compareAt={compareAt} size="lg" />
+            <p className="mt-1 text-[12.5px] text-muted">
+              or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((price / 4) * 100) / 100)}</b> with <b className="text-ink">Afterpay</b>
+            </p>
+          </div>
+
           <div ref={ctaRef} className="mt-4 flex gap-2">
             {allSoldOut ? (
               <button type="button" onClick={() => setNotifyFor(product.variants[0])} className="btn btn-primary h-14 flex-1 text-[15px]">
@@ -388,16 +311,23 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
             <FavouriteButton handle={product.handle} label={label} className="!h-14 !w-14 border border-line hover:border-ink" size={22} />
           </div>
 
-          {/* Reassurance directly under the CTA (brief §5.C.1–3) */}
-          <ul className="mt-5 divide-y divide-line border-y border-line text-[13px]">
+          {/* Key benefits below the CTA */}
+          {benefits.length > 0 && (
+            <ul className="mt-6 space-y-1.5 text-[13.5px]">
+              {benefits.map((b) => (
+                <li key={b} className="flex gap-2.5">
+                  <CheckIcon size={16} className="mt-0.5 shrink-0" />
+                  {b}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <ul className="mt-6 divide-y divide-line border-y border-line text-[13px]">
             <li className="flex items-start gap-3 py-3.5">
               <TruckIcon size={20} className="mt-px shrink-0" />
               <div>
-                {remaining <= 0 ? (
-                  <p className="font-semibold">Qualifies for free standard shipping</p>
-                ) : (
-                  <p className="font-semibold">Add {formatMoney(remaining)} more for free standard shipping</p>
-                )}
+                {remaining <= 0 ? <p className="font-semibold">Qualifies for free standard shipping</p> : <p className="font-semibold">Add {formatMoney(remaining)} more for free standard shipping</p>}
                 <p className="t-meta">Shipping is calculated at checkout for orders under $99.</p>
               </div>
             </li>
@@ -430,11 +360,7 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
                 ) : (
                   <>
                     <p className="font-semibold">
-                      {storeQty ? (
-                        <span className={storeQty <= 2 ? "text-warn" : "text-success"}>{storeQty <= 2 ? `Low stock at ${store.name}` : `In stock at ${store.name}`}</span>
-                      ) : (
-                        <span>Not in stock at {store.name}</span>
-                      )}
+                      {storeQty ? <span className={storeQty <= 2 ? "text-warn" : "text-success"}>{storeQty <= 2 ? `Low stock at ${store.name}` : `In stock at ${store.name}`}</span> : <span>Not in stock at {store.name}</span>}
                     </p>
                     <p className="t-meta">
                       Size {variant.title} · updated {stockUpdatedMinutesAgo(variant.id)} min ago ·{" "}
@@ -483,6 +409,141 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
       <Lightbox open={lightbox !== null} onClose={() => setLightbox(null)} images={images} start={lightbox ?? 0} alt={label} />
       <style>{`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}`}</style>
     </>
+  );
+}
+
+/** Thumbnail rail + one large image; click to zoom. No hover zoom, no extra captions. */
+function DesktopGallery({ images, alt, onOpen }: { images: string[]; alt: string; onOpen: (i: number) => void }) {
+  const [i, setI] = useState(0);
+  return (
+    <div className="hidden gap-3 lg:flex">
+      <ul className="no-scrollbar flex max-h-[min(calc(100dvh-120px),720px)] w-[72px] shrink-0 flex-col gap-2 overflow-y-auto">
+        {images.map((src, k) => (
+          <li key={src}>
+            <button
+              type="button"
+              onMouseEnter={() => setI(k)}
+              onFocus={() => setI(k)}
+              onClick={() => setI(k)}
+              aria-label={`Show image ${k + 1} of ${images.length}`}
+              aria-current={k === i}
+              className={`block aspect-square w-full overflow-hidden bg-image ${k === i ? "ring-1 ring-ink" : "opacity-70 hover:opacity-100"}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={shopifyImage(src, 160)} alt="" className="h-full w-full object-cover" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="relative min-w-0 flex-1">
+        <button type="button" onClick={() => onOpen(i)} className="block w-full cursor-zoom-in bg-image" aria-label={`Zoom image ${i + 1} of ${images.length}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={shopifyImage(images[i], 1200)}
+            srcSet={shopifySrcSet(images[i], [800, 1200, 1600, 2048])}
+            sizes="(min-width:1280px) 50vw, 55vw"
+            alt={`${alt} — view ${i + 1}`}
+            fetchPriority={i === 0 ? "high" : "auto"}
+            className="mx-auto aspect-square max-h-[min(calc(100dvh-120px),720px)] w-full object-contain"
+          />
+        </button>
+        <div className="absolute bottom-3 right-3 flex gap-1.5">
+          <button type="button" onClick={() => setI((n) => (n - 1 + images.length) % images.length)} aria-label="Previous image" className="grid h-10 w-10 place-items-center bg-white/90 hover:bg-white">
+            <ChevronLeft size={18} />
+          </button>
+          <button type="button" onClick={() => setI((n) => (n + 1) % images.length)} aria-label="Next image" className="grid h-10 w-10 place-items-center bg-white/90 hover:bg-white">
+            <ChevronRight size={18} />
+          </button>
+        </div>
+        {/* preload the rest so thumbnail swaps are instant */}
+        <div className="hidden" aria-hidden>
+          {images.map((src) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={shopifyImage(src, 1200)} alt="" loading="lazy" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Sizes in a single row; scrolls horizontally and opens at the most common sizes. */
+function SizeRow({
+  variants,
+  selected,
+  anchor,
+  label,
+  alerts,
+  onPick,
+  onSoldOut,
+  shake,
+}: {
+  variants: ProductVariant[];
+  selected: string | null;
+  anchor: string | null;
+  label: (v: ProductVariant) => string;
+  alerts: string[];
+  onPick: (v: ProductVariant) => void;
+  onSoldOut: (v: ProductVariant) => void;
+  shake: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+  const measure = () => {
+    const el = ref.current;
+    if (!el) return;
+    setEdges({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
+  };
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const target = el.querySelector<HTMLElement>(`[data-size="${CSS.escape(selected ?? anchor ?? "")}"]`);
+    if (target) el.scrollLeft = Math.max(0, target.offsetLeft - (selected ? el.clientWidth / 2 - target.offsetWidth / 2 : 0));
+    measure();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <div className="relative mt-2.5">
+      <div ref={ref} onScroll={measure} role="radiogroup" aria-labelledby="size-label" className={`no-scrollbar flex gap-1.5 overflow-x-auto overflow-y-hidden scroll-smooth ${shake ? "animate-[shake_0.35s]" : ""}`}>
+        {variants.map((v) => {
+          const isSel = v.title === selected;
+          const low = v.availableForSale && v.quantityAvailable <= LOW_STOCK_THRESHOLD;
+          if (!v.availableForSale) {
+            const alert = alerts.includes(v.id);
+            return (
+              <button
+                key={v.id}
+                data-size={v.title}
+                type="button"
+                onClick={() => onSoldOut(v)}
+                aria-label={`Size ${label(v)} sold out — ${alert ? "restock alert set" : "get a restock alert"}`}
+                className="relative grid h-11 min-w-[52px] shrink-0 place-items-center border border-dashed border-line-strong px-2 text-[13px] text-subtle hover:border-ink hover:text-ink"
+              >
+                <span className="line-through decoration-1">{label(v)}</span>
+                <BellIcon size={9} className={`absolute right-1 top-1 ${alert ? "text-ink" : ""}`} />
+              </button>
+            );
+          }
+          return (
+            <button
+              key={v.id}
+              data-size={v.title}
+              type="button"
+              role="radio"
+              aria-checked={isSel}
+              onClick={() => onPick(v)}
+              aria-label={`Size ${label(v)}${low ? `, only ${v.quantityAvailable} left` : ""}`}
+              className={`relative grid h-11 min-w-[52px] shrink-0 place-items-center border px-2 text-[13.5px] font-semibold tabular-nums transition-colors ${isSel ? "border-ink bg-ink text-white" : "border-line bg-white hover:border-ink"}`}
+            >
+              {label(v)}
+              {low && <span className={`absolute right-1 top-1 h-1.5 w-1.5 rounded-full ${isSel ? "bg-jd-yellow" : "bg-warn"}`} aria-hidden />}
+            </button>
+          );
+        })}
+      </div>
+      {edges.left && <span className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white" aria-hidden />}
+      {edges.right && <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white" aria-hidden />}
+    </div>
   );
 }
 

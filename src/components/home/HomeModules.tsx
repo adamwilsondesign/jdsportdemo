@@ -5,18 +5,17 @@ import Link from "next/link";
 import { useState } from "react";
 import type { CardProduct } from "@/lib/types";
 import { formatMoney, shopifyImage } from "@/lib/format";
-import { ArrowRightIcon, ChevronDown, PlusIcon } from "@/components/ui/Icons";
+import { ArrowRightIcon, PlusIcon } from "@/components/ui/Icons";
 import { Price } from "@/components/product/bits";
 
 export type Hotspot = { x: number; y: number; product: CardProduct; label: string };
 
 /** Campaign imagery that leads straight into commerce (brief §3.C.2). */
-export function ShoppableLook({ image, eyebrow, title, copy, hotspots, cta }: { image: string; eyebrow: string; title: string; copy: string; hotspots: Hotspot[]; cta: { label: string; href: string } }) {
+export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: string; title: string; copy: string; hotspots: Hotspot[]; cta: { label: string; href: string } }) {
   const [active, setActive] = useState<number | null>(null);
-  const total = hotspots.reduce((n, h) => n + h.product.price, 0);
   return (
     <section aria-labelledby="look-title" className="py-12 md:py-20">
-      <div className="container-jd grid items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
+      <div className="container-jd grid grid-cols-[minmax(0,1fr)] items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
         <div className="relative aspect-[4/5] overflow-hidden bg-image">
           <Image src={image} alt="Model wearing an UGG shearling moto jacket, balloon jeans and Tasman slippers" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
           {hotspots.map((h, i) => (
@@ -42,8 +41,7 @@ export function ShoppableLook({ image, eyebrow, title, copy, hotspots, cta }: { 
           ))}
         </div>
         <div>
-          <p className="t-eyebrow text-muted">{eyebrow}</p>
-          <h2 id="look-title" className="t-h1 mt-3">
+          <h2 id="look-title" className="t-h1">
             {title}
           </h2>
           <p className="t-body mt-4 max-w-md text-muted">{copy}</p>
@@ -68,38 +66,10 @@ export function ShoppableLook({ image, eyebrow, title, copy, hotspots, cta }: { 
               </li>
             ))}
           </ol>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <Link href={cta.href} className="btn btn-primary">
-              {cta.label}
-            </Link>
-            <span className="t-meta">Full look {formatMoney(total)} · ships free</span>
-          </div>
+          <Link href={cta.href} className="btn btn-primary mt-6">
+            {cta.label}
+          </Link>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/** Collapsed SEO copy: indexable, but no longer a wall of scroll (brief §3.C.4). */
-export function SeoBlock({ title, paragraphs }: { title: string; paragraphs: string[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <section aria-labelledby="seo-title" className="container-jd pt-4">
-      <div className="max-w-3xl border-t border-line pt-10">
-        <h2 id="seo-title" className="t-eyebrow text-muted">
-          {title}
-        </h2>
-        <div id="seo-copy" className={`relative mt-3 overflow-hidden text-[13.5px] leading-relaxed text-muted ${open ? "" : "max-h-[4.6em]"}`}>
-          {paragraphs.map((p) => (
-            <p key={p.slice(0, 20)} className="mb-3">
-              {p}
-            </p>
-          ))}
-          {!open && <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white" />}
-        </div>
-        <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="seo-copy" className="mt-1 inline-flex items-center gap-1 text-[13px] font-bold">
-          {open ? "Read less" : "Read more"} <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-        </button>
       </div>
     </section>
   );

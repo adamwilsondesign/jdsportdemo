@@ -6,9 +6,11 @@ import type { CardProduct, CardSwatch, CardVariant } from "@/lib/types";
 import { shopifyImage } from "@/lib/format";
 import { availabilityNote, toMerchandise } from "@/lib/merch";
 import { useStore } from "@/components/providers/StoreProvider";
-import { Badge, FavouriteButton, Price, ProductImage, Rating, pickBadge } from "./bits";
-import { BagIcon, CheckIcon, CloseIcon, PlusIcon } from "@/components/ui/Icons";
+import { Badge, FavouriteButton, Price, ProductImage, pickBadge } from "./bits";
+import { BagIcon, CheckIcon, CloseIcon, PlusIcon, StarIcon } from "@/components/ui/Icons";
 import { Overlay } from "@/components/ui/Overlay";
+import { BRAND_LOGOS, BrandLogo } from "@/components/ui/BrandLogo";
+import { COLOUR_SWATCH } from "@/lib/filters";
 
 export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22vw, (min-width:768px) 30vw, 48vw" }: { product: CardProduct; priority?: boolean; sizes?: string }) {
   const [activeHandle, setActiveHandle] = useState(product.handle);
@@ -16,35 +18,48 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
   const [quickOpen, setQuickOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const soldOut = !active.variants.some((v) => v.available);
-  const badge = pickBadge({ price: active.price, compareAt: active.compareAt, exclusive: product.exclusive, isNew: product.isNew, soldOut });
-  const note = availabilityNote(active.variants);
+  const badge = pickBadge({ price: active.price, compareAt: active.compareAt, isNew: product.isNew, soldOut });
+  const stock = soldOut ? null : stockTag(active.variants);
   const label = `${product.brand} ${product.model}`;
   const href = `/products/${active.handle}`;
   const swatches = product.swatches;
-  const extraColours = swatches.length - 1;
 
   return (
-    <article className="group/card relative flex flex-col" onMouseLeave={() => setQuickOpen(false)}>
-      <div className="relative">
+    <article className="relative flex flex-col">
+      {/* Hover behaviour (alt image, Quick Buy) is scoped to the image only */}
+      <div className="group/img relative" onMouseLeave={() => setQuickOpen(false)}>
         <Link href={href} className="block" aria-label={`${label}, ${active.colourway}`}>
           <ProductImage src={active.image} alt={`${label} in ${active.colourway}`} sizes={sizes} priority={priority} />
           {active.hoverImage && (
-            // Alternate angle on hover (desktop only) — the merchandised rollover image from JD's data
+            // Alternate angle on hover (desktop only), swapped instantly — no cross-fade
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={shopifyImage(active.hoverImage, 720)}
               alt=""
               aria-hidden
               loading="lazy"
-              className="pointer-events-none absolute inset-0 hidden h-full w-full object-cover opacity-0 transition-opacity duration-500 md:block md:group-hover/card:opacity-100"
+              className="pointer-events-none absolute inset-0 hidden h-full w-full bg-image object-cover md:group-hover/img:block"
             />
           )}
         </Link>
 
-        <div className="pointer-events-none absolute left-2 top-2 flex gap-1">{badge && <Badge {...badge} />}</div>
+        <div className="pointer-events-none absolute left-2 top-2 flex flex-col items-start gap-1">
+          {badge && <Badge {...badge} />}
+          {stock && (
+            <span className="inline-flex h-6 items-center gap-1.5 bg-white px-2 text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink">
+              <span className="h-1.5 w-1.5 rounded-full bg-warn" aria-hidden />
+              {stock}
+            </span>
+          )}
+        </div>
         <FavouriteButton handle={active.handle} label={label} className="absolute right-0 top-0 text-ink hover:text-sale" />
 
-        {/* Desktop quick buy: sizes in place, scroll position untouched (brief §3.B.3) */}
+        {/* Brand mark sits on the image instead of taking a text line */}
+        <span className={`pointer-events-none absolute bottom-3 left-3 text-ink transition-opacity ${quickOpen ? "opacity-0" : "md:group-hover/img:opacity-0"}`}>
+          <BrandLogo brand={product.brand} className={BRAND_LOGOS[product.brand] ? "h-7 w-7" : "text-[11px] tracking-[0.04em]"} />
+        </span>
+
+        {/* Desktop quick buy */}
         {!soldOut && (
           <div className="pointer-events-none absolute inset-2 hidden flex-col justify-end md:flex [&>*]:pointer-events-auto">
             {quickOpen ? (
@@ -53,7 +68,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
               <button
                 type="button"
                 onClick={() => setQuickOpen(true)}
-                className="btn h-10 min-h-0 w-full translate-y-1 bg-white/95 text-[13px] text-ink opacity-0 shadow-sm backdrop-blur transition-all hover:bg-ink hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover/card:translate-y-0 group-hover/card:opacity-100"
+                className="btn h-10 min-h-0 w-full bg-white text-[13px] text-ink opacity-0 shadow-sm transition-opacity hover:bg-ink hover:text-white focus-visible:opacity-100 group-hover/img:opacity-100"
               >
                 Quick Buy
                 <span className="sr-only"> {label}</span>
@@ -74,47 +89,43 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
         )}
       </div>
 
-      <div className="flex flex-1 flex-col pt-3">
-        <Link href={href} className="flex flex-1 flex-col">
-          <span className="t-eyebrow text-[10.5px] text-muted">{product.brand}</span>
-          <h3 className="mt-1 line-clamp-2 min-h-[2.5em] text-[13.5px] font-semibold leading-[1.25] group-hover/card:underline group-hover/card:underline-offset-2 md:text-sm">
+      <div className="pt-3">
+        <Link href={href} className="block">
+          <span className="sr-only">{product.brand} </span>
+          <h3 className="truncate text-[14px] font-semibold leading-snug hover:underline hover:underline-offset-2" title={product.model}>
             {product.model}
           </h3>
-          <span className="t-meta mt-0.5 line-clamp-1 text-[12px]">{active.colourway}</span>
-          <div className="mt-2 min-h-[20px]">
-            <Price price={active.price} compareAt={active.compareAt} size="sm" />
-          </div>
+          <p className="mt-0.5 truncate text-[12.5px] text-muted">{active.colourway}</p>
         </Link>
-        {/* swatches — reserved row so cards align even with a single colour */}
-        <div className="mt-2 flex h-6 items-center gap-1.5">
-          {swatches.length > 1 && (
-            <>
-              {swatches.slice(0, 4).map((s) => (
-                <button
-                  key={s.handle}
-                  type="button"
-                  onMouseEnter={() => setActiveHandle(s.handle)}
-                  onFocus={() => setActiveHandle(s.handle)}
-                  onClick={() => setActiveHandle(s.handle)}
-                  aria-label={`Show colour ${s.colourway}`}
-                  aria-pressed={s.handle === activeHandle}
-                  className={`relative h-6 w-6 overflow-hidden bg-image transition-shadow ${s.handle === activeHandle ? "ring-1 ring-ink ring-offset-1" : "ring-1 ring-transparent hover:ring-line-strong"}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={shopifyImage(s.image, 80)} alt="" className="h-full w-full object-cover" loading="lazy" />
-                </button>
-              ))}
-              <span className="t-meta ml-0.5 text-[11px]">{extraColours === 1 ? "+1 colour" : `+${extraColours} colours`}</span>
-            </>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <Price price={active.price} compareAt={active.compareAt} size="sm" showSaving={false} />
+          {product.reviews && (
+            <span className="flex shrink-0 items-center gap-1 text-[12px] font-semibold tabular-nums">
+              <StarIcon size={12} />
+              {product.reviews.rating.toFixed(1)}
+              <span className="font-normal text-muted">({product.reviews.count})</span>
+              <span className="sr-only"> out of 5, {product.reviews.count} reviews</span>
+            </span>
           )}
         </div>
-
-        <div className="mt-1.5">
-          <Rating reviews={product.reviews} />
-        </div>
-        <div className="mt-1 h-4 text-[11.5px] font-semibold" aria-live="polite">
-          {note && <span className={note.tone === "warn" ? "text-warn" : "text-muted"}>{note.text}</span>}
-        </div>
+        {swatches.length > 1 && (
+          <div className="mt-2.5 flex items-center gap-2" role="group" aria-label={`${swatches.length} colours`}>
+            {swatches.slice(0, 5).map((s) => (
+              <button
+                key={s.handle}
+                type="button"
+                onClick={() => setActiveHandle(s.handle)}
+                aria-label={`Show colour ${s.colourway}`}
+                aria-pressed={s.handle === activeHandle}
+                title={s.colourway}
+                className={`grid h-5 w-5 place-items-center rounded-full ${s.handle === activeHandle ? "ring-1 ring-ink ring-offset-2" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2"}`}
+              >
+                <span className="h-4 w-4 rounded-full border border-black/15" style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }} />
+              </button>
+            ))}
+            <span className="t-meta text-[11.5px]">{swatches.length} colours</span>
+          </div>
+        )}
       </div>
 
       <Overlay open={sheetOpen} onClose={() => setSheetOpen(false)} side="bottom" label={`Quick buy ${label}`}>
@@ -122,6 +133,13 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
       </Overlay>
     </article>
   );
+}
+
+/** Factual stock tag from variant inventory — only shown when it's genuinely limited. */
+function stockTag(variants: CardVariant[]) {
+  const note = availabilityNote(variants);
+  if (!note || note.tone !== "warn") return null;
+  return note.text.startsWith("Limited") ? "Limited sizes" : note.text.startsWith("Only") ? note.text : "Low stock";
 }
 
 function useQuickAdd(product: CardProduct, swatch: CardSwatch | CardProduct) {

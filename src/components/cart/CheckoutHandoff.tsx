@@ -23,8 +23,7 @@ export function CheckoutHandoff() {
               <span className="text-white/40">→</span>
               <span className={`rounded-sm px-2 py-1 text-[12px] font-extrabold ${express ? "bg-shoppay" : "bg-white text-ink"}`}>{express ? "Shop Pay" : "Shopify Checkout"}</span>
             </div>
-            <p className="t-eyebrow mt-10 text-jd-yellow">End of prototype</p>
-            <h1 className="t-h1 mt-3">This is where {express ? "Shop Pay" : "Shopify Checkout"} takes over</h1>
+            <h1 className="t-h1 mt-10">This is where {express ? "Shop Pay" : "Shopify Checkout"} takes over</h1>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/75">
               In production, the cart hands off to Shopify&apos;s hosted checkout with the same line items, so everything below is handled by the platform, not custom code.
             </p>

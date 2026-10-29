@@ -10,10 +10,18 @@ const COLS = [
   { title: "Brands", links: ["Nike", "Jordan", "adidas", "New Balance", "The North Face", "On", "UGG"] },
 ];
 
+const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
+
 export function Footer() {
   return (
-    <footer className="on-dark mt-24 bg-ink text-white">
-      <div className="border-b border-white/10">
+    <footer className="on-dark relative mt-24 overflow-hidden bg-ink text-white">
+      {/* Brand moment: oversized roundel watermark */}
+      <JDLogo
+        size={900}
+        className="pointer-events-none absolute -bottom-[22%] -right-[8%] h-auto w-[min(900px,85vw)] text-white opacity-[0.07] md:-bottom-[30%] md:-right-[4%]"
+      />
+
+      <div className="relative border-b border-white/10">
         <div className="container-jd grid grid-cols-2 gap-6 py-8 text-[13px] md:grid-cols-4">
           {[
             { icon: TruckIcon, t: "Free standard shipping", s: "On orders over $99" },
@@ -31,7 +39,8 @@ export function Footer() {
           ))}
         </div>
       </div>
-      <div className="container-jd grid gap-10 py-14 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
+
+      <div className="container-jd relative grid gap-10 py-14 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
         <div className="max-w-sm">
           <JDLogo size={52} />
           <p className="t-h3 mt-6">Get on the list</p>
@@ -46,11 +55,15 @@ export function Footer() {
         </div>
         {COLS.map((c) => (
           <div key={c.title}>
-            <p className="t-eyebrow mb-4 text-white/55">{c.title}</p>
-            <ul className="space-y-2.5 text-sm">
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">{c.title}</p>
+            {/* Hover: the hovered link goes yellow + bold, its siblings recede to 80% */}
+            <ul className="group/links space-y-2.5 text-sm">
               {c.links.map((l) => (
                 <li key={l}>
-                  <Link href={c.title === "Brands" ? `/collections/${l.toLowerCase().replace(/\s+/g, "-")}` : `/pages/${l.toLowerCase().replace(/\s+/g, "-")}`} className="text-white/85 hover:text-white hover:underline hover:underline-offset-4">
+                  <Link
+                    href={c.title === "Brands" ? `/collections/${slug(l)}` : `/pages/${slug(l)}`}
+                    className="text-white transition-[opacity,color] duration-150 group-hover/links:opacity-80 hover:!opacity-100 hover:font-bold hover:text-jd-yellow focus-visible:font-bold focus-visible:text-jd-yellow"
+                  >
                     {l}
                   </Link>
                 </li>
@@ -59,9 +72,10 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-white/10">
+
+      <div className="relative border-t border-white/10">
         <div className="container-jd flex flex-col gap-4 py-6 text-xs text-white/55 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 JD Sports Canada · Concept prototype — not affiliated checkout · Prices in CAD</p>
+          <p>© 2026 JD Sports Canada · Concept prototype · Prices in CAD</p>
           <PaymentIcons tone="dark" />
         </div>
       </div>

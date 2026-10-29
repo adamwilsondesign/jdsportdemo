@@ -58,56 +58,39 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Reserved aspect ratios, so there is no layout shift.
 
 **Home**
-- Destination-specific hero CTAs with **named campaign tabs** instead of dots, plus pause control and progress.
-- Shopping benefits row.
-- Explicit "Shop by Category".
-- Persistent **New Arrivals** rail with tabs, "View all (N)", position counter and end state.
-- Editorial tiles with label, headline and named CTA.
-- **Shoppable UGG look** with hotspots.
-- "Only at JD" band.
-- Sale rail.
-- Store module.
-- Collapsed SEO copy.
+- One shoppable campaign hero (no carousel) with a single named CTA, kept short so the next section shows above the fold.
+- "Shop by Category" with a yellow wipe hover.
+- Five-up product rows for New Arrivals, Only at JD and Sale, each with one "View all (N)" link and no tabs or pagination.
+- Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
+- **Shop by Brand** tiles using brand logos.
+- Store module, and a footer with a giant JD watermark.
 - Compact remembered **country confirmation** instead of a blocking modal.
 
 **PLP**
 - Counts beside every filter value (disjunctive faceting).
-- **Shoes / Clothing / Accessories size groups**.
-- **In-stock toggle**.
-- Brand search.
-- Selection count on each group heading ("Brand · 2").
-- Removable chips and Clear all.
-- Sticky toolbar with result count.
-- Full-height mobile sheet with "View N items".
-- Use-case shortcuts.
-- **Load more** with "Showing X of Y" and URL state.
-- Scroll restoration after visiting a PDP.
-- Back to top.
-- No-results recovery.
+- **Shoes / Clothing / Accessories size groups**, **in-stock toggle**, brand search.
+- Applied filters shown in the sidebar, so toggling never pushes the grid down.
+- One sticky bar for filter toggle, result count, quick filters and sort.
+- 3 columns with filters open, 4 with them hidden.
+- Promo cards and full-row campaign banners merchandised into the grid.
+- **Infinite scroll** with URL state, scroll restoration after visiting a PDP, back to top, and no-results recovery.
+- Full-height mobile filter sheet with "View N items".
 
 **Product cards**
-- Brand on its own line above the model.
-- "+N colours" with swatches that update image, price and availability.
-- Hover alternate angle.
-- In-place **Quick Buy** with purchasable sizes. Its "Added" confirmation card is fully clickable and opens the cart.
-- Factual stock line.
-- Stable card height.
+- Brand logo over the image; model, colourway, price and rating in a tight block.
+- Sale, New and low-stock tags over the image.
+- Colour dots that switch the card's image, price and availability.
+- Hover effects (instant alternate angle, Quick Buy) apply to the image only.
+- In-place **Quick Buy**; its "Added" confirmation opens the cart.
 
 **PDP**
-- Three key benefits near the price.
-- Colour switching that **keeps the selected size** and explains when that size is sold out (linking to colours that have it).
-- US/UK/EU/CM toggle, remembered.
-- Model fit cue.
-- **Fit recommender**.
-- Size guide.
-- Distinct size states.
-- **Back-in-stock alerts** on sold-out sizes.
-- "Only 2 left in size 10" shown only after selection.
-- Free-shipping qualification and returns summary under the CTA.
-- **Inline store stock** after size selection, with preferred store remembered.
-- Desktop 2-up gallery with zoom lightbox; mobile swipe with "1 / 6".
-- Details, story and care kept separate.
-- Fit-summary reviews.
+- Thumbnail rail and one large image, click to zoom; mobile swipe with "1 / 6".
+- Buy box order: brand logo, name, colours, a **single scrollable size row**, price with Afterpay, then **Add to Cart** above the fold.
+- Size kept across colour changes, with links to colours that have it when it's sold out.
+- US/UK/EU/CM toggle (remembered), fit cue, **fit recommender**, size guide.
+- **Back-in-stock alerts** on sold-out sizes; "Only 2 left in size 10" only after selection.
+- Key benefits, free-shipping qualification, returns summary and **inline store stock** under the CTA.
+- Details, story and care kept separate; fit-summary reviews.
 - One "Complete the Look" and one "You Might Also Like".
 - **Mobile sticky purchase bar**.
 

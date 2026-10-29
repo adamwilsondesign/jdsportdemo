@@ -60,12 +60,11 @@ export function Rating({ reviews }: { reviews: { rating: number; count: number }
 
 export type BadgeKind = "sale" | "exclusive" | "new" | "soldout";
 
-/** Controlled badge system — one badge per card, fixed priority (brief §3.B.6). */
-export function pickBadge(p: { price: number; compareAt: number | null; exclusive: boolean; isNew: boolean; soldOut?: boolean }): { kind: BadgeKind; label: string } | null {
+/** Controlled badge system — one merchandising badge per card, fixed priority. */
+export function pickBadge(p: { price: number; compareAt: number | null; isNew: boolean; exclusive?: boolean; soldOut?: boolean }): { kind: BadgeKind; label: string } | null {
   if (p.soldOut) return { kind: "soldout", label: "Sold out" };
   const pct = percentOff(p.price, p.compareAt);
   if (pct) return { kind: "sale", label: `−${pct}%` };
-  if (p.exclusive) return { kind: "exclusive", label: "Only at JD" };
   if (p.isNew) return { kind: "new", label: "New" };
   return null;
 }

@@ -63,6 +63,7 @@ export type CardVariant = { id: string; title: string; available: boolean; qty: 
 export type CardSwatch = {
   handle: string;
   colourway: string;
+  colourFamily: string;
   image: string;
   hoverImage: string | null;
   price: number;

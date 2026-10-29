@@ -31,11 +31,17 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
         shortcuts={def.shortcuts}
         defaultSort={def.defaultSort}
         breadcrumb={[{ label: "Home", href: "/" }, ...(isBrand ? [{ label: "Brands", href: "/collections/all" }] : []), { label: def.title }]}
-        promo={
-          handle === "only-at-jd" || handle === "sale"
-            ? undefined
-            : { href: "/collections/only-at-jd", eyebrow: "Only at JD", title: "Exclusive colourways you won't find anywhere else", cta: "Shop exclusives" }
-        }
+        merch={{
+          cards: [
+            ...(handle !== "only-at-jd" ? [{ href: "/collections/only-at-jd", title: "Only at JD: colourways you won't find anywhere else", cta: "Shop exclusives" }] : []),
+            { href: "/products/jordan-1-high-og-black-multi-color", title: "Jordan 1 High OG “Game Royal”", cta: "Shop the release", image: "/campaign/edit-new-release.webp" },
+            ...(handle !== "sale" ? [{ href: "/collections/sale", title: "Sale: up to 60% off", cta: "Shop sale", image: "/campaign/edit-adidas.webp" }] : []),
+          ],
+          banners: [
+            { href: "/collections/basketball", title: "Get buckets", copy: "Signature models, retros and court-ready classics.", cta: "Shop Basketball Shoes", image: "/campaign/hero-get-buckets-d.webp" },
+            { href: "/collections/layers", title: "Layers on layers", copy: "Oversized hoodies, crews and full-zips for the cold months.", cta: "Shop Hoodies & Fleece", image: "/campaign/hero-layers-d.webp" },
+          ],
+        }}
       />
     </Suspense>
   );

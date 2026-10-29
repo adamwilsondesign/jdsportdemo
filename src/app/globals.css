@@ -165,6 +165,8 @@ html {
 }
 
 body {
+  /* clip (not hidden) so full-bleed rows can't cause sideways page scroll, without breaking position: sticky */
+  overflow-x: clip;
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);

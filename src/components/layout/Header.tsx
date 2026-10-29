@@ -147,8 +147,7 @@ function MegaMenu({ item, onNavigate, brands }: { item: NavItem; onNavigate: () 
         <Link href={item.feature.href} onClick={onNavigate} className="group relative block aspect-[4/3] overflow-hidden bg-image">
           <Image src={item.feature.image} alt="" fill sizes="360px" className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-16 text-white">
-            <p className="t-eyebrow text-jd-yellow">{item.feature.eyebrow}</p>
-            <p className="mt-1 text-lg font-bold leading-tight">{item.feature.title}</p>
+            <p className="text-lg font-bold leading-tight">{item.feature.title}</p>
             <p className="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4">
               {item.feature.cta} <ChevronRight size={14} />
             </p>

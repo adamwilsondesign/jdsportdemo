@@ -35,6 +35,7 @@ function cardBasics(p: Product) {
   return {
     handle: p.handle,
     colourway: p.colourway,
+    colourFamily: p.colourFamily,
     image: p.featuredImage.url,
     hoverImage: p.images[1]?.url ?? null,
     price,
@@ -49,7 +50,6 @@ export function toCard(p: Product): CardProduct {
     id: p.id,
     brand: p.brand,
     model: p.model,
-    colourFamily: p.colourFamily,
     category: p.category,
     gender: p.gender,
     style: p.style,

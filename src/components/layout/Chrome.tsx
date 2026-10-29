@@ -3,47 +3,19 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "@/components/providers/StoreProvider";
-import { CheckIcon, ChevronLeft, ChevronRight, CloseIcon } from "@/components/ui/Icons";
+import { CheckIcon, CloseIcon } from "@/components/ui/Icons";
 
-const MESSAGES = [
-  { text: "Free standard shipping on orders over $99", href: "/pages/shipping", cta: "Details" },
-  { text: "Pay in 4 interest-free payments with Afterpay", href: "/pages/payment-methods", cta: "Learn more" },
-];
-
-/** Max two messages, ranked by commercial priority, each linking to matching terms (brief §8). */
+/** One marketing message, and the sentence itself is the link (no separate "Details" CTA). */
 export function AnnouncementBar() {
-  const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
-  useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((n) => (n + 1) % MESSAGES.length), 6000);
-    return () => clearInterval(t);
-  }, [paused]);
-  const m = MESSAGES[i];
   return (
-    <div className="bg-jd-yellow text-ink" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+    <div className="bg-jd-yellow text-ink">
       <div className="container-jd flex h-9 items-center justify-between gap-4 text-[12px] font-semibold">
-        <div className="hidden w-56 lg:block">
-          <span className="text-[11.5px]">🇨🇦 Shipping across Canada</span>
-        </div>
-        <div className="flex flex-1 items-center justify-center gap-1">
-          <button type="button" aria-label="Previous message" onClick={() => setI((n) => (n + MESSAGES.length - 1) % MESSAGES.length)} className="grid h-8 w-8 place-items-center md:hidden">
-            <ChevronLeft size={14} />
-          </button>
-          <p className="truncate text-center" aria-live="polite">
-            <span className="hidden md:inline">
-              {MESSAGES[0].text} <Link href={MESSAGES[0].href} className="link-underline ml-1 font-bold">{MESSAGES[0].cta}</Link>
-              <span className="mx-4 opacity-40">|</span>
-              {MESSAGES[1].text} <Link href={MESSAGES[1].href} className="link-underline ml-1 font-bold">{MESSAGES[1].cta}</Link>
-            </span>
-            <span className="md:hidden">
-              {m.text}
-            </span>
-          </p>
-          <button type="button" aria-label="Next message" onClick={() => setI((n) => (n + 1) % MESSAGES.length)} className="grid h-8 w-8 place-items-center md:hidden">
-            <ChevronRight size={14} />
-          </button>
-        </div>
+        <div className="hidden w-56 lg:block" aria-hidden />
+        <p className="flex-1 truncate text-center">
+          <Link href="/pages/shipping" className="underline-offset-4 hover:underline">
+            Free standard shipping on orders over $99
+          </Link>
+        </p>
         <nav aria-label="Utility" className="hidden w-56 justify-end gap-4 whitespace-nowrap text-[11.5px] lg:flex">
           <Link href="/pages/order-tracking" className="hover:underline">Order Tracking</Link>
           <Link href="/pages/store-locator" className="hover:underline">Stores</Link>

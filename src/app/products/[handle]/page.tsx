@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ProductView, type SiblingLite } from "@/components/pdp/ProductView";
 import { Reviews } from "@/components/pdp/Reviews";
-import { ProductRail } from "@/components/home/ProductRail";
+import { ProductRow } from "@/components/home/ProductRow";
 import { ProductCard } from "@/components/product/ProductCard";
 import { getAllProducts, getCompleteTheLook, getProduct, getRecommendations, getSiblings, toCard } from "@/lib/storefront";
 
@@ -64,7 +64,6 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
       {/* Distinct "Complete the Look" — complementary categories, not more of the same (brief §5.C.4) */}
       {look.length > 0 && (
         <section aria-labelledby="ctl-title" className="container-jd mt-16 border-t border-line pt-14">
-          <p className="t-eyebrow mb-2 text-muted">Pairs well with</p>
           <h2 id="ctl-title" className="t-h2">
             Complete the Look
           </h2>
@@ -82,7 +81,7 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
 
       {/* One curated similar-products carousel instead of repeated "You Might Like" modules */}
       <div className="border-t border-line">
-        <ProductRail id="similar" eyebrow={`More ${product.style.toLowerCase()} ${product.category === "Footwear" ? "shoes" : "styles"}`} title="You Might Also Like" tabs={[{ label: "All", products: similar, viewAll: { href: `/collections/${product.category === "Footwear" ? "footwear" : product.category === "Clothing" ? "clothing" : "accessories"}?filter.style=${encodeURIComponent(product.style).replace(/%20/g, "+")}`, count: similar.length } }]} />
+        <ProductRow id="similar" title="You Might Also Like" products={similar} viewAll={{ href: `/collections/${product.category === "Footwear" ? "footwear" : product.category === "Clothing" ? "clothing" : "accessories"}?filter.style=${encodeURIComponent(product.style).replace(/%20/g, "+")}`, count: similar.length }} />
       </div>
     </>
   );

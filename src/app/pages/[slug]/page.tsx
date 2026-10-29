@@ -33,8 +33,7 @@ export default async function InfoPage({ params }: { params: Promise<{ slug: str
   const page = PAGES[slug];
   return (
     <div className="container-jd max-w-3xl py-14">
-      <p className="t-eyebrow text-muted">Customer care</p>
-      <h1 className="t-h1 mt-2">{page?.title ?? "Coming soon"}</h1>
+      <h1 className="t-h1">{page?.title ?? "Coming soon"}</h1>
       <div className="t-body mt-6 space-y-4">
         {(page?.body ?? ["This page is outside the scope of the redesign prototype (Home, collection, product and cart)."]).map((b) => (
           <p key={b}>{b}</p>
