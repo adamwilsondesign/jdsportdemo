@@ -120,34 +120,8 @@ export default function HomePage() {
 
       <ProductRow id="new" title="New Arrivals" products={logoFirst(dedupe(newArrivals).filter((p) => p.category !== "Accessories")).map(toCard)} viewAll={{ href: "/collections/new-arrivals", count: newArrivals.length }} />
 
-      <EditorialPair
-        label="Featured stories"
-        items={[
-          { img: "/campaign/edit-adidas.webp", title: "Terrace classics, fresh colourways", copy: "Samba, SL72 and Gazelle — the low-profile icons of the season.", cta: "Shop adidas Originals", href: "/collections/adidas?filter.category=Footwear" },
-          { img: "/campaign/edit-new-release.webp", light: true, position: "50% 75%", title: "Jordan 1 High OG “Game Royal”", copy: "Black and royal leather on the silhouette that started it all.", cta: "Shop the Jordan 1 High OG", href: "/products/jordan-1-high-og-black-multi-color" },
-        ]}
-      />
-
-      <ShoppableLook
-        image="/campaign/edit-ugg.webp"
-        title="Cozy, city-ready"
-        copy="A shearling moto jacket, balloon-leg denim and the Tasman slipper — every piece in the shot is in stock and ready to ship."
-        hotspots={hotspots}
-        cta={{ label: "Shop UGG", href: "/collections/ugg" }}
-      />
-
-      <ProductRow id="exclusive" title="Only at JD" products={logoFirst(dedupe(exclusives)).map(toCard)} viewAll={{ href: "/collections/only-at-jd", count: exclusives.length }} />
-
-      <EditorialPair
-        label="More stories"
-        items={[
-          { img: "/campaign/edit-on-the-court.webp", title: "Built for the court", copy: "Signature models, retros and hoops-ready lifestyle pairs from Jordan, Nike and Reebok.", cta: "Shop Basketball Shoes", href: "/collections/basketball" },
-          { img: "/campaign/hero-layers-m.webp", position: "50% 30%", title: "Layers on layers", copy: "Oversized hoodies, crews and full-zips from Hoodrich, Nike, Criminal Damage and EA7.", cta: "Shop Hoodies & Fleece", href: "/collections/layers" },
-        ]}
-      />
-
       {/* Shop by Brand — a full-bleed black stage: cut-out hero shoes, white marks */}
-      <section aria-labelledby="brand-title" className="on-dark relative my-12 overflow-hidden bg-ink py-14 text-white md:my-16 md:py-20">
+      <section aria-labelledby="brand-title" className="on-dark relative mb-12 overflow-hidden bg-ink py-14 text-white md:mb-16 md:py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,238,0,0.10),transparent_60%)]" aria-hidden />
         <div className="container-jd relative">
           <div className="mb-8 flex items-end justify-between gap-6 md:mb-10">
@@ -185,6 +159,32 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      <EditorialPair
+        label="Featured stories"
+        items={[
+          { img: "/campaign/edit-adidas.webp", title: "Terrace classics, fresh colourways", copy: "Samba, SL72 and Gazelle — the low-profile icons of the season.", cta: "Shop adidas Originals", href: "/collections/adidas?filter.category=Footwear" },
+          { img: "/campaign/edit-new-release.webp", light: true, position: "50% 75%", title: "Jordan 1 High OG “Game Royal”", copy: "Black and royal leather on the silhouette that started it all.", cta: "Shop the Jordan 1 High OG", href: "/products/jordan-1-high-og-black-multi-color" },
+        ]}
+      />
+
+      <ShoppableLook
+        image="/campaign/edit-ugg.webp"
+        title="Cozy, city-ready"
+        copy="A shearling moto jacket, balloon-leg denim and the Tasman slipper — every piece in the shot is in stock and ready to ship."
+        hotspots={hotspots}
+        cta={{ label: "Shop UGG", href: "/collections/ugg" }}
+      />
+
+      <ProductRow id="exclusive" title="Only at JD" products={logoFirst(dedupe(exclusives)).map(toCard)} viewAll={{ href: "/collections/only-at-jd", count: exclusives.length }} />
+
+      <EditorialPair
+        label="More stories"
+        items={[
+          { img: "/campaign/edit-on-the-court.webp", title: "Built for the court", copy: "Signature models, retros and hoops-ready lifestyle pairs from Jordan, Nike and Reebok.", cta: "Shop Basketball Shoes", href: "/collections/basketball" },
+          { img: "/campaign/hero-layers-m.webp", position: "50% 30%", title: "Layers on layers", copy: "Oversized hoodies, crews and full-zips from Hoodrich, Nike, Criminal Damage and EA7.", cta: "Shop Hoodies & Fleece", href: "/collections/layers" },
+        ]}
+      />
 
       <ProductRow id="sale" title="Sale: Up to 60% Off" products={byDiscount.map(toCard)} viewAll={{ href: "/collections/sale", count: sale.length }} />
 
