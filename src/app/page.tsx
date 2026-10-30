@@ -45,9 +45,10 @@ function EditorialCard({ e }: { e: Editorial }) {
   );
 }
 
-const BRAND_STAGE = [
+// `size` overrides the default cut-out width/position for taller silhouettes
+const BRAND_STAGE: { brand: string; cutout: string; product: string; size?: string }[] = [
   { brand: "Nike", cutout: "/brand-cutouts/nike.webp", product: "Air Max 95 Big Bubble" },
-  { brand: "Jordan", cutout: "/brand-cutouts/jordan.webp", product: "Jordan 4 Retro “Fire Red”" },
+  { brand: "Jordan", cutout: "/brand-cutouts/jordan-3.webp", product: "Jordan 3 Retro “True Blue”", size: "w-[70%] top-[50%]" },
   { brand: "adidas", cutout: "/brand-cutouts/adidas.webp", product: "Gazelle Indoor" },
   { brand: "New Balance", cutout: "/brand-cutouts/new-balance.webp", product: "880" },
   { brand: "On", cutout: "/brand-cutouts/on.webp", product: "Cloudrunner 3" },
@@ -144,7 +145,7 @@ export default function HomePage() {
                     src={b.cutout}
                     alt=""
                     loading="lazy"
-                    className="pointer-events-none absolute left-1/2 top-[54%] w-[84%] -translate-x-1/2 -translate-y-1/2 -rotate-[9deg] drop-shadow-[0_24px_28px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-[58%] group-hover:-rotate-[14deg]"
+                    className={`pointer-events-none absolute left-1/2 ${b.size ?? "top-[54%] w-[84%]"} -translate-x-1/2 -translate-y-1/2 -rotate-[9deg] drop-shadow-[0_24px_28px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-[58%] group-hover:-rotate-[14deg]`}
                   />
                   <span className="relative flex items-end justify-between gap-2 text-[12px]">
                     <span className="hidden text-white/60 sm:inline">{b.product}</span>
