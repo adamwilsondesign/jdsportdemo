@@ -186,7 +186,7 @@ export default function HomePage() {
         ]}
       />
 
-      <ProductRow id="sale" title="Sale: Up to 60% Off" products={byDiscount.map(toCard)} viewAll={{ href: "/collections/sale", count: sale.length }} />
+      <ProductRow id="sale" title="Sale: Up to 60% Off" products={dedupe(byDiscount).map(toCard)} viewAll={{ href: "/collections/sale", count: sale.length }} />
 
       {/* Store module — edge to edge, flush into the footer */}
       <section aria-labelledby="store-title" className="on-dark -mb-24 mt-12 grid overflow-hidden bg-ink text-white md:grid-cols-[1fr_1.2fr]">

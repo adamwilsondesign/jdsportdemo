@@ -85,7 +85,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 **Product cards**
 - Brand logo over the image (no mark taller than the Nike swoosh); model, colourway, price and rating in a tight block.
 - Sale, New and low-stock tags over the image.
-- Colour bars (short 8:1 strips, white border, yellow when selected) that switch the card's image, price and availability.
+- Colourway thumbnails (hover previews, click selects, yellow bar marks the choice) that switch the card's image, price and availability.
 - Hover effects (instant alternate angle, Quick Buy) apply to the image only.
 - In-place **Quick Buy**; its "Added" confirmation opens the cart.
 

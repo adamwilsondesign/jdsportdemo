@@ -10,11 +10,12 @@ import { Badge, FavouriteButton, Price, ProductImage, pickBadge } from "./bits";
 import { BagIcon, CheckIcon, CloseIcon, PlusIcon, StarIcon } from "@/components/ui/Icons";
 import { Overlay } from "@/components/ui/Overlay";
 import { BrandLogo } from "@/components/ui/BrandLogo";
-import { COLOUR_SWATCH } from "@/lib/filters";
 
 export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22vw, (min-width:768px) 30vw, 48vw" }: { product: CardProduct; priority?: boolean; sizes?: string }) {
   const [activeHandle, setActiveHandle] = useState(product.handle);
-  const active: CardSwatch | CardProduct = product.swatches.find((s) => s.handle === activeHandle) ?? product;
+  // hovering a colourway thumbnail previews it; clicking commits it
+  const [previewHandle, setPreviewHandle] = useState<string | null>(null);
+  const active: CardSwatch | CardProduct = product.swatches.find((s) => s.handle === (previewHandle ?? activeHandle)) ?? product;
   const [quickOpen, setQuickOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const soldOut = !active.variants.some((v) => v.available);
@@ -118,25 +119,34 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
           </div>
         </Link>
         {swatches.length > 1 && (
-          // Short colour bars butted together: white border keeps dark colours visible on black, yellow marks the selection
-          <div className="mt-2 flex items-center" role="group" aria-label={`${swatches.length} colours`}>
-            {swatches.slice(0, 5).map((s) => (
-              <button
-                key={s.handle}
-                type="button"
-                onClick={() => setActiveHandle(s.handle)}
-                aria-label={`Show colour ${s.colourway}`}
-                aria-pressed={s.handle === activeHandle}
-                title={s.colourway}
-                className="group/sw relative py-2"
-              >
-                <span
-                  className={`block h-[6px] w-12 border transition-colors ${s.handle === activeHandle ? "relative z-10 border-jd-yellow" : "border-white shadow-[0_0_0_1px_rgba(0,0,0,0.12)] group-hover/sw:border-jd-yellow/60"}`}
-                  style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }}
-                />
-              </button>
-            ))}
-            <span className="t-meta ml-3 text-[11.5px]">{swatches.length} colours</span>
+          // Colourway thumbnails: the real product shot reads on any background, unlike flat colour chips
+          <div className="mt-2.5 flex items-center gap-1.5" role="group" aria-label={`${swatches.length} colours`} onMouseLeave={() => setPreviewHandle(null)}>
+            {swatches.slice(0, 4).map((s) => {
+              const selected = s.handle === activeHandle;
+              return (
+                <button
+                  key={s.handle}
+                  type="button"
+                  onClick={() => setActiveHandle(s.handle)}
+                  onMouseEnter={() => setPreviewHandle(s.handle)}
+                  onFocus={() => setPreviewHandle(s.handle)}
+                  onBlur={() => setPreviewHandle(null)}
+                  aria-label={`Show colour ${s.colourway}`}
+                  aria-pressed={selected}
+                  title={s.colourway}
+                  className="group/sw relative h-10 w-10 shrink-0 overflow-hidden bg-image"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 40px thumbnails from the Shopify CDN */}
+                  <img src={shopifyImage(s.image, 96)} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover/sw:scale-110" />
+                  <span className={`absolute inset-x-0 bottom-0 h-[3px] bg-jd-yellow transition-transform duration-200 ${selected ? "scale-x-100" : "scale-x-0 group-hover/sw:scale-x-100 group-hover/sw:opacity-60"}`} aria-hidden />
+                </button>
+              );
+            })}
+            {swatches.length > 4 && (
+              <Link href={href} className="t-meta grid h-10 min-w-10 place-items-center px-1 text-[12px] font-semibold hover:text-current" aria-label={`See all ${swatches.length} colours`}>
+                +{swatches.length - 4}
+              </Link>
+            )}
           </div>
         )}
       </div>
