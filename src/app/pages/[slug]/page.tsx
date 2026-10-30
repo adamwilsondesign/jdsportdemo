@@ -17,6 +17,13 @@ const PAGES: Record<string, { title: string; body: string[] }> = {
     title: "Payment Methods",
     body: ["We accept Visa, Mastercard, American Express, PayPal, Shop Pay and Apple Pay.", "Afterpay lets you split eligible orders into 4 interest-free payments."],
   },
+  "buy-now-pay-later": {
+    title: "Buy Now, Pay Later",
+    body: [
+      "Split eligible orders into interest-free installments with Afterpay, Shop Pay Installments, Sezzle or PayPal Pay Later.",
+      "Choose your installment option at checkout. Eligibility and terms are set by each provider.",
+    ],
+  },
   "store-locator": {
     title: "Store Locator",
     body: ["Set a preferred store from any product page to see size availability where you shop. Store locations in this prototype are demo data."],

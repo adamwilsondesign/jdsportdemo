@@ -22,7 +22,7 @@ export function ProductRow({ id, title, products, viewAll }: { id: string; title
             <ArrowRightIcon size={14} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
-        <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 sm:gap-4 md:mx-0 md:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
+        <ul className="no-scrollbar -mx-8 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-8 sm:gap-4 md:mx-0 md:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
           {top.map((p, i) => (
             <li key={p.handle} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-auto">
               <ProductCard product={p} priority={i < 2 && id === "new"} sizes="(min-width:1024px) 24vw, (min-width:640px) 31vw, 46vw" />

@@ -83,7 +83,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Full-height mobile filter sheet with "View N items".
 
 **Product cards**
-- Brand logo over the image; model, colourway, price and rating in a tight block.
+- Brand logo over the image (no mark taller than the Nike swoosh); model, colourway, price and rating in a tight block.
 - Sale, New and low-stock tags over the image.
 - Colour dots that switch the card's image, price and availability.
 - Hover effects (instant alternate angle, Quick Buy) apply to the image only.
@@ -95,6 +95,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Size kept across colour changes, with links to colours that have it when it's sold out.
 - US/UK/EU/CM toggle (remembered), fit cue, **fit recommender**, size guide.
 - **Back-in-stock alerts** on sold-out sizes; "Only 2 left in size 10" only after selection.
+- Buy Now, Pay Later marks (Afterpay, Shop Pay, Sezzle, PayPal) from jdsports.ca under the price.
 - Key benefits, free-shipping qualification, returns summary and **inline store stock** under the CTA.
 - Details, story and care kept separate; fit-summary reviews.
 - One "Complete the Look" and one "You Might Also Like".

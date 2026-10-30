@@ -41,7 +41,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
             </Link>
           ))}
         </div>
-        <div className="flex flex-col justify-center bg-surface p-6 md:p-10 lg:p-14">
+        <div className="theme-light flex flex-col justify-center bg-surface p-6 md:p-10 lg:p-14">
           <h2 id="look-title" className="t-h1">
             {title}
           </h2>
@@ -49,7 +49,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
           <ol className="mt-8 divide-y divide-line border-y border-line">
             {hotspots.map((h, i) => (
               <li key={h.product.handle} onMouseEnter={() => setActive(i)} onMouseLeave={() => setActive(null)}>
-                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 px-2 py-3 transition-colors ${active === i ? "bg-white/[0.06]" : ""}`}>
+                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 px-2 py-3 transition-colors ${active === i ? "bg-white" : ""}`}>
                   <span className="w-5 text-center text-[12px] font-bold tabular-nums text-muted">{i + 1}</span>
                   <span className="h-16 w-16 shrink-0 bg-image">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -67,7 +67,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
               </li>
             ))}
           </ol>
-          <Link href={cta.href} className="btn btn-yellow mt-6">
+          <Link href={cta.href} className="btn btn-primary mt-6">
             {cta.label}
           </Link>
         </div>

@@ -93,7 +93,7 @@ export default function HomePage() {
 
       <section aria-labelledby="cat-title" className="reveal container-jd pt-12 md:pt-16">
         <SectionHeading id="cat-title" title="Shop by Category" />
-        <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto overflow-y-hidden px-4 md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-6 md:gap-4">
+        <div className="no-scrollbar -mx-8 flex snap-x gap-3 overflow-x-auto overflow-y-hidden px-8 md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-6 md:gap-4">
           {categories.map((c) => (
             <Link key={c.label} href={c.href} className="group w-[42%] shrink-0 snap-start md:w-auto">
               <div className="relative aspect-square overflow-hidden bg-image">
@@ -191,7 +191,7 @@ export default function HomePage() {
 
       {/* Store module — edge to edge, flush into the footer */}
       <section aria-labelledby="store-title" className="on-dark -mb-24 mt-12 grid overflow-hidden bg-ink text-white md:grid-cols-[1fr_1.2fr]">
-        <div className="flex flex-col justify-center px-4 py-12 md:px-[max(24px,calc((100vw-1600px)/2+40px))] md:py-16 lg:pr-16">
+        <div className="flex flex-col justify-center px-8 py-12 md:px-[max(48px,calc((100vw-1600px)/2+80px))] md:py-16 lg:pr-16">
           <h2 id="store-title" className="t-h2">
             See what&apos;s in stock at your store
           </h2>

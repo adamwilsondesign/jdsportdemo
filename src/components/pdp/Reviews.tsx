@@ -47,7 +47,7 @@ export function Reviews({ product }: { product: Product }) {
   return (
     <section id="reviews" aria-labelledby="reviews-title" className="container-jd scroll-mt-28 py-14">
       <h2 id="reviews-title" className="t-h2">
-        Reviews <span className="text-muted">({r.count})</span>
+        Reviews
       </h2>
       <div className="mt-8 grid gap-10 lg:grid-cols-[320px_1fr] lg:gap-16">
         <div>

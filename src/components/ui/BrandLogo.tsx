@@ -37,7 +37,8 @@ export function BrandLogo({ brand, size = 32, tone = "dark", className = "" }: {
   if (!logo) {
     return <span className={`font-extrabold uppercase leading-none tracking-tight ${tone === "light" ? "text-white" : "text-ink"} ${className}`}>{brand}</span>;
   }
-  const h = Math.round(Math.min(size * 1.15, Math.max(size * 0.32, size / Math.sqrt(logo.ratio))));
+  // Never taller than the Nike swoosh at the same size, so tall marks (On, Jordan) don't tower
+  const h = Math.round(Math.min(size / Math.sqrt(BRAND_LOGOS.Nike.ratio), Math.max(size * 0.32, size / Math.sqrt(logo.ratio))));
   return (
     // eslint-disable-next-line @next/next/no-img-element -- tiny static SVG marks
     <img src={logo.src} alt={brand} height={h} width={Math.round(h * logo.ratio)} style={{ height: h, width: "auto" }} className={`${tone === "light" ? "invert" : ""} ${className}`} />
