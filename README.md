@@ -69,7 +69,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - The whole page sits on black (`.theme-dark` re-points the neutral tokens).
 - Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
 - **Shop Featured Brands** tiles using brand logos.
-- Store module, and a footer that ends on the JD roundel, growing from 75% to 100% and fading up to full white as it scrolls into view.
+- Store module, and a footer with a giant JD watermark.
 - No country pop-up: the announcement bar and CAD pricing already say where you are.
 
 **PLP**

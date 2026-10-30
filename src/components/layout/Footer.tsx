@@ -14,7 +14,13 @@ const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 
 export function Footer() {
   return (
-    <footer className="on-dark relative mt-24 overflow-clip bg-ink text-white">
+    <footer className="on-dark relative mt-24 overflow-hidden bg-ink text-white">
+      {/* Brand moment: oversized roundel watermark */}
+      <JDLogo
+        size={900}
+        className="pointer-events-none absolute -bottom-[22%] -right-[8%] h-auto w-[min(900px,85vw)] text-white opacity-[0.056] md:-bottom-[30%] md:-right-[4%]"
+      />
+
       <div className="relative border-b border-white/10">
         <div className="container-jd grid grid-cols-2 gap-6 py-8 text-[13px] md:grid-cols-4">
           {[
@@ -72,12 +78,6 @@ export function Footer() {
           <p>© 2026 JD Sports Canada · Concept prototype · Prices in CAD</p>
           <PaymentIcons tone="dark" />
         </div>
-      </div>
-
-      {/* Brand moment: the whole roundel closes the page, growing from 75% and fading up to full white
-          as it scrolls in. Its own band, so it never sits behind link text. */}
-      <div className="pointer-events-none flex justify-center pb-16 pt-6 md:pb-24 md:pt-10" aria-hidden>
-        <JDLogo size={440} className="footer-mark h-auto w-[min(440px,64vw)] text-white" />
       </div>
     </footer>
   );
