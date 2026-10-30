@@ -121,7 +121,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
         {swatches.length > 1 && (
           // Colourway thumbnails: the real product shot reads on any background, unlike flat colour chips
           <div className="mt-2.5 flex items-center gap-1.5" role="group" aria-label={`${swatches.length} colours`} onMouseLeave={() => setPreviewHandle(null)}>
-            {swatches.slice(0, 4).map((s) => {
+            {swatches.slice(0, 4).map((s, i) => {
               const selected = s.handle === activeHandle;
               return (
                 <button
@@ -134,7 +134,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
                   aria-label={`Show colour ${s.colourway}`}
                   aria-pressed={selected}
                   title={s.colourway}
-                  className="group/sw relative h-10 w-10 shrink-0 overflow-hidden bg-image"
+                  className={`group/sw relative h-8 w-8 shrink-0 overflow-hidden bg-image sm:h-10 sm:w-10 ${i === 3 ? "hidden sm:block" : ""}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element -- 40px thumbnails from the Shopify CDN */}
                   <img src={shopifyImage(s.image, 96)} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover/sw:scale-110" />
@@ -142,9 +142,15 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
                 </button>
               );
             })}
-            {swatches.length > 4 && (
-              <Link href={href} className="t-meta grid h-10 min-w-10 place-items-center px-1 text-[12px] font-semibold hover:text-current" aria-label={`See all ${swatches.length} colours`}>
-                +{swatches.length - 4}
+            {/* phones show three thumbnails, larger screens four */}
+            {swatches.length > 3 && (
+              <Link
+                href={href}
+                className={`t-meta grid h-8 min-w-8 place-items-center px-1 text-[12px] font-semibold hover:text-current sm:h-10 ${swatches.length > 4 ? "" : "sm:hidden"}`}
+                aria-label={`See all ${swatches.length} colours`}
+              >
+                <span className="sm:hidden">+{swatches.length - 3}</span>
+                <span className="hidden sm:inline">+{swatches.length - 4}</span>
               </Link>
             )}
           </div>

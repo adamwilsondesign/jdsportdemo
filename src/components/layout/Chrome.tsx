@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useStore } from "@/components/providers/StoreProvider";
 import { CheckIcon, CloseIcon } from "@/components/ui/Icons";
 
@@ -23,42 +22,6 @@ export function AnnouncementBar() {
             <b>EN</b> / <span className="opacity-60">FR</span>
           </span>
         </nav>
-      </div>
-    </div>
-  );
-}
-
-/** Replaces the blocking country modal with a compact, remembered confirmation (brief §3.A.5). */
-export function CountryNotice() {
-  const { prefs, setPrefs, hydrated } = useStore();
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    if (!hydrated || prefs.countryConfirmed) return;
-    const t = setTimeout(() => setShow(true), 1200);
-    return () => clearTimeout(t);
-  }, [hydrated, prefs.countryConfirmed]);
-  if (!show || prefs.countryConfirmed) return null;
-  return (
-    <div role="region" aria-label="Shipping country" className="fixed bottom-4 left-4 right-4 z-[90] animate-rise bg-white p-4 shadow-[0_12px_40px_rgba(0,0,0,0.18)] sm:left-auto sm:w-[360px]">
-      <div className="flex items-start gap-3">
-        <span className="text-2xl leading-none" aria-hidden>
-          🇨🇦
-        </span>
-        <div className="flex-1">
-          <p className="text-sm font-bold">You&apos;re shopping JD Sports Canada</p>
-          <p className="t-meta mt-0.5">Prices in CAD · Shipping to Canadian addresses</p>
-          <div className="mt-3 flex gap-2">
-            <button type="button" onClick={() => setPrefs({ countryConfirmed: true })} className="btn btn-primary h-9 min-h-0 px-4 text-[12.5px]">
-              <CheckIcon size={14} /> Continue
-            </button>
-            <a href="https://www.jdsports.com" className="btn btn-outline h-9 min-h-0 px-4 text-[12.5px]">
-              Change country
-            </a>
-          </div>
-        </div>
-        <button type="button" onClick={() => setPrefs({ countryConfirmed: true })} aria-label="Dismiss" className="-mr-2 -mt-2 grid h-9 w-9 place-items-center text-muted">
-          <CloseIcon size={16} />
-        </button>
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
     <Suspense>
       <CollectionView
         title={def.title}
+        brand={isBrand ? def.title : undefined}
         description={def.description}
         products={products}
         shortcuts={def.shortcuts}

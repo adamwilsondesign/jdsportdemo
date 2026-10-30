@@ -306,7 +306,7 @@ export function CartSummary({ onCheckout, compact }: { onCheckout?: () => void; 
         <Link href="/checkout" onClick={onCheckout} aria-disabled={blocked} className={`btn btn-primary px-3 text-[15px] ${blocked ? "pointer-events-none opacity-40" : ""}`}>
           Checkout
         </Link>
-        <Link href="/checkout?express=shop-pay" onClick={onCheckout} className="btn bg-shoppay px-3 text-[15px] text-white hover:brightness-110" aria-label="Express checkout with Shop Pay">
+        <Link href="/checkout?express=shop-pay" onClick={onCheckout} className="btn btn-shoppay px-3 text-[15px]" aria-label="Express checkout with Shop Pay">
           ShopPay
         </Link>
       </div>

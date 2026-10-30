@@ -1,3 +1,4 @@
+import { SaleBanner } from "@/components/pdp/SaleBanner";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -79,8 +80,10 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
 
       <Reviews product={product} />
 
+      <SaleBanner />
+
       {/* One curated similar-products carousel instead of repeated "You Might Like" modules */}
-      <div className="border-t border-line">
+      <div>
         <ProductRow id="similar" title="You Might Also Like" products={similar} viewAll={{ href: `/collections/${product.category === "Footwear" ? "footwear" : product.category === "Clothing" ? "clothing" : "accessories"}?filter.style=${encodeURIComponent(product.style).replace(/%20/g, "+")}`, count: similar.length }} />
       </div>
     </>

@@ -69,15 +69,15 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - The whole page sits on black (`.theme-dark` re-points the neutral tokens).
 - Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
 - **Shop Featured Brands** tiles using brand logos.
-- Store module, and a footer with a giant JD watermark.
-- Compact remembered **country confirmation** instead of a blocking modal.
+- Store module, and a footer whose giant JD roundel grows (75% → 100%) and fades up to full white as it scrolls into view.
+- No country pop-up: the announcement bar and CAD pricing already say where you are.
 
 **PLP**
 - Counts beside every filter value (disjunctive faceting).
 - **Shoes / Clothing / Accessories size groups**, **in-stock toggle**, brand search.
 - Applied filters shown in the sidebar, so toggling never pushes the grid down.
 - One sticky bar for filter toggle, result count, quick filters and sort.
-- 3 columns with filters open, 4 with them hidden.
+- 3 columns with filters open, 4 with them hidden; toggling animates the cards into place (View Transitions).
 - Promo cards and full-row campaign banners merchandised into the grid.
 - **Infinite scroll** with URL state, scroll restoration after visiting a PDP, back to top, and no-results recovery.
 - Full-height mobile filter sheet with "View N items".
@@ -100,6 +100,8 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Details, story and care kept separate; fit-summary reviews.
 - One "Complete the Look" and one "You Might Also Like".
 - **Mobile sticky purchase bar**.
+- Adding to cart keeps the shopper on the page: the button confirms and the bag icon animates.
+- A sale band between Complete the Look and You Might Also Like.
 
 **Cart**
 - Single state source, so badge, heading and totals always agree.
@@ -112,7 +114,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Sale savings per line and in total.
 - Shipping "Calculated at checkout" and tax "TBD", with an explainer.
 - Afterpay split.
-- Shop Pay express button.
+- Shop Pay express button (side by side with Checkout, with its own wipe hover).
 - Payment marks.
 - Returns reminder.
 - Collapsible "Complete the look".

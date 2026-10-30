@@ -85,7 +85,7 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
         compareAtPrice: variant.compareAtPrice,
         quantityAvailable: variant.quantityAvailable,
         product: { handle: product.handle, brand: product.brand, model: product.model, colourway: product.colourway, category: product.category, image: product.featuredImage.url },
-      });
+      }, 1, { openDrawer: false }); // the button confirms and the bag icon animates; the drawer stays closed
       setState("added");
       setTimeout(() => setState("idle"), 2200);
     }, 450);

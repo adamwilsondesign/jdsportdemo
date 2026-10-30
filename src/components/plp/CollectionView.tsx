@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { flushSync } from "react-dom";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { CardProduct } from "@/lib/types";
 import { SORTS, type CollectionShortcut, type SortKey } from "@/lib/collections";
@@ -12,6 +13,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { FilterPanel } from "./FilterPanel";
 import { Overlay } from "@/components/ui/Overlay";
 import { ArrowUpIcon, ChevronDown, CloseIcon, FilterIcon } from "@/components/ui/Icons";
+import { BrandLogo, hasLogo } from "@/components/ui/BrandLogo";
 
 const PAGE_SIZE = 24;
 
@@ -21,6 +23,7 @@ export type Merchandising = { cards: PromoCard[]; banners: PromoBanner[] };
 
 export function CollectionView({
   title,
+  brand,
   description,
   products,
   shortcuts,
@@ -29,6 +32,8 @@ export function CollectionView({
   merch,
 }: {
   title: string;
+  /** Brand collections lead with the brand's mark instead of its name */
+  brand?: string;
   description?: string;
   products: CardProduct[];
   shortcuts?: CollectionShortcut[];
@@ -44,6 +49,13 @@ export function CollectionView({
   const page = Math.max(1, Number(sp.get("page")) || 1);
   // Filters start hidden; the grid gets the full width until the shopper asks for them
   const [sidebar, setSidebar] = useState(false);
+  // Showing/hiding filters animates via the View Transitions API: cards glide between 4 and 3 columns
+  const toggleSidebar = () => {
+    const flip = () => flushSync(() => setSidebar((v) => !v));
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) flip();
+    else doc.startViewTransition(flip);
+  };
   const [density, setDensity] = useState<"compact" | "large">("compact");
   useEffect(() => {
     try {
@@ -236,14 +248,21 @@ export function CollectionView({
             ))}
           </ol>
         </nav>
-        <h1 className="t-h1">{title}</h1>
+        {brand && hasLogo(brand) ? (
+          <h1 className="pt-1">
+            <span className="sr-only">{title}</span>
+            <BrandLogo brand={brand} size={110} />
+          </h1>
+        ) : (
+          <h1 className="t-h1">{title}</h1>
+        )}
         {description && <p className="t-body mt-2 max-w-2xl text-muted">{description}</p>}
       </div>
 
       {/* Sticky filter bar: filter toggle, count, quick filters, sort — all in one row */}
       <div className="sticky top-14 z-30 mt-6 border-y border-line bg-white/95 backdrop-blur">
         <div className="container-jd flex h-14 items-center gap-3">
-          <button type="button" onClick={() => setSidebar((s) => !s)} className="hidden h-10 shrink-0 items-center gap-2 text-[13px] font-bold lg:flex" aria-expanded={sidebar} aria-controls="plp-filters">
+          <button type="button" onClick={toggleSidebar} className="hidden h-10 shrink-0 items-center gap-2 text-[13px] font-bold lg:flex" aria-expanded={sidebar} aria-controls="plp-filters">
             <FilterIcon size={18} /> {sidebar ? "Hide filters" : "Show filters"}
             {nActive > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[11px] text-white">{nActive}</span>}
           </button>
@@ -316,7 +335,7 @@ export function CollectionView({
           ) : (
             <>
               <ul
-                className={`grid gap-x-3 gap-y-10 sm:gap-x-4 md:gap-y-12 ${
+                className={`plp-grid grid gap-x-3 gap-y-10 sm:gap-x-4 md:gap-y-12 ${
                   density === "large" ? "grid-cols-1 sm:grid-cols-2 md:gap-x-6" : `grid-cols-2 md:grid-cols-3 ${sidebar ? "" : "lg:grid-cols-4"}`
                 } transition-opacity duration-300 ${busy ? "opacity-50" : ""}`}
               >

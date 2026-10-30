@@ -14,13 +14,7 @@ const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 
 export function Footer() {
   return (
-    <footer className="on-dark relative mt-24 overflow-hidden bg-ink text-white">
-      {/* Brand moment: oversized roundel watermark */}
-      <JDLogo
-        size={900}
-        className="pointer-events-none absolute -bottom-[22%] -right-[8%] h-auto w-[min(900px,85vw)] text-white opacity-[0.056] md:-bottom-[30%] md:-right-[4%]"
-      />
-
+    <footer className="footer-reveal on-dark relative mt-24 overflow-hidden bg-ink text-white">
       <div className="relative border-b border-white/10">
         <div className="container-jd grid grid-cols-2 gap-6 py-8 text-[13px] md:grid-cols-4">
           {[
@@ -77,6 +71,14 @@ export function Footer() {
         <div className="container-jd flex flex-col gap-4 py-6 text-xs text-white/55 md:flex-row md:items-center md:justify-between">
           <p>© 2026 JD Sports Canada · Concept prototype · Prices in CAD</p>
           <PaymentIcons tone="dark" />
+        </div>
+      </div>
+
+      {/* Brand moment: the roundel rises out of the bottom edge, growing from 75% and fading up to full
+          white as the footer scrolls in. It sits in its own band so it never sits behind link text. */}
+      <div className="pointer-events-none relative h-[calc(min(960px,84vw)*0.44)] overflow-hidden" aria-hidden>
+        <div className="absolute left-1/2 top-0 w-[min(960px,84vw)] -translate-x-1/2">
+          <JDLogo size={960} className="footer-mark h-auto w-full text-white opacity-[0.056]" />
         </div>
       </div>
     </footer>

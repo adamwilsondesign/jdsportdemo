@@ -4,7 +4,7 @@ import "./globals.css";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { AnnouncementBar, CountryNotice, Toaster } from "@/components/layout/Chrome";
+import { AnnouncementBar, Toaster } from "@/components/layout/Chrome";
 import { CartDrawer } from "@/components/cart/Cart";
 import { BRANDS, getAllProducts } from "@/lib/storefront";
 
@@ -44,7 +44,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main id="main">{children}</main>
           <Footer />
           <CartDrawer />
-          <CountryNotice />
           <Toaster />
         </StoreProvider>
       </body>

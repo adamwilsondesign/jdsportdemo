@@ -64,6 +64,10 @@
   from { transform: translateY(-3%) scale(1.07); }
   to { transform: translateY(3%) scale(1.07); }
 }
+@keyframes footer-mark {
+  from { transform: scale(0.75); opacity: 0.056; }
+  to { transform: scale(1); opacity: 1; }
+}
 @keyframes qb-in {
   from { opacity: 0; transform: scale(0.92) translateY(6px); }
   to { opacity: 1; transform: none; }
@@ -185,7 +189,8 @@
   .btn-primary,
   .btn-yellow,
   .btn-outline,
-  .btn-ghost-light {
+  .btn-ghost-light,
+  .btn-shoppay {
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 0% 100%;
@@ -195,6 +200,8 @@
   .btn-yellow:hover:not(:disabled),
   .btn-outline:hover:not(:disabled),
   .btn-ghost-light:hover:not(:disabled),
+  .btn-shoppay:hover:not(:disabled),
+  .btn-shoppay:focus-visible,
   .btn-primary:focus-visible,
   .btn-yellow:focus-visible {
     background-size: 100% 100%;
@@ -207,6 +214,9 @@
   .btn-outline:hover:not(:disabled) { color: #fff; }
   .btn-ghost-light { border: 1px solid rgba(255, 255, 255, 0.85); color: #fff; background-image: linear-gradient(#fff, #fff); }
   .btn-ghost-light:hover { color: var(--color-ink); border-color: #fff; }
+  /* Shop Pay: purple with a deep-violet wipe and a lift, clearly different from the black Checkout */
+  .btn-shoppay { background-color: var(--color-shoppay); background-image: linear-gradient(#2c0f9e, #2c0f9e); color: #fff; }
+  .btn-shoppay:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(90, 49, 244, 0.7); }
 
   /* Animated underline: retracts and redraws on hover */
   .link-underline {
@@ -238,6 +248,18 @@
         animation: parallax-drift linear both;
         animation-timeline: view();
         animation-range: cover;
+      }
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .footer-reveal { view-timeline: --footer; }
+    @media (prefers-reduced-motion: no-preference) {
+      .footer-mark {
+        transform-origin: 50% 35%;
+        animation: footer-mark linear both;
+        animation-timeline: --footer;
+        animation-range: entry 0% entry 100%;
       }
     }
   }
@@ -286,6 +308,18 @@ body {
   background: var(--color-jd-yellow);
   color: var(--color-ink);
 }
+
+/* PLP filter toggle: cards glide to their new columns, the sidebar slides in */
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.plp-grid > li { view-transition-name: match-element; }
+#plp-filters { view-transition-name: plp-filters; }
+::view-transition-new(plp-filters) { animation: 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both plp-sidebar-in; }
+::view-transition-old(plp-filters) { animation: 300ms ease-in both plp-sidebar-out; }
+@keyframes plp-sidebar-in { from { opacity: 0; transform: translateX(-24px); } }
+@keyframes plp-sidebar-out { to { opacity: 0; transform: translateX(-24px); } }
 
 @media (prefers-reduced-motion: reduce) {
   *,
