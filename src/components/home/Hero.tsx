@@ -16,7 +16,7 @@ export function Hero({ content }: { content: HeroContent }) {
       <div className="relative aspect-[4/4.6] overflow-hidden sm:aspect-auto sm:h-[460px] lg:h-[min(560px,calc(100dvh-230px))] lg:min-h-[420px]">
         <picture>
           <source media="(min-width: 640px)" srcSet={content.desktop} />
-          <img src={content.mobile} alt={content.alt} fetchPriority="high" loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+          <img src={content.mobile} alt={content.alt} fetchPriority="high" loading="eager" className="parallax absolute inset-0 h-full w-full object-cover" />
         </picture>
         <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/80 via-black/35 to-transparent sm:h-1/2" />
         <div className="container-jd absolute inset-x-0 bottom-0 pb-6 sm:pb-10">

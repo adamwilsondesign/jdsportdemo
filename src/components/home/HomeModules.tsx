@@ -18,7 +18,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
       {/* Same 2-up grid and gutter as the editorial pair above, so the two rows read as one grid */}
       <div className="container-jd grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
         <div className="relative aspect-[4/5] overflow-hidden bg-image md:aspect-[5/6]">
-          <Image src={image} alt="Model wearing an UGG shearling moto jacket, balloon jeans and Tasman slippers" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
+          <Image src={image} alt="Model wearing an UGG shearling moto jacket, balloon jeans and Tasman slippers" fill sizes="(min-width:1024px) 50vw, 100vw" className="parallax object-cover" />
           {hotspots.map((h, i) => (
             <Link
               key={h.product.handle}

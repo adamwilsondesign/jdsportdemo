@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Hero, type HeroContent } from "@/components/home/Hero";
 import { ProductRow } from "@/components/home/ProductRow";
-import { SectionHeading, ShoppableLook } from "@/components/home/HomeModules";
+import { ShoppableLook } from "@/components/home/HomeModules";
 import { getAllProducts, getCollectionDef, getCollectionProducts, getProduct, toCard } from "@/lib/storefront";
 import { shopifyImage, slugify } from "@/lib/format";
 import { BrandLogo, hasLogo } from "@/components/ui/BrandLogo";
@@ -33,7 +33,7 @@ function EditorialPair({ items, label }: { items: Editorial[]; label: string }) 
 function EditorialCard({ e }: { e: Editorial }) {
   return (
     <div className="relative aspect-[4/5] overflow-hidden bg-image md:aspect-[5/6]">
-      <Image src={e.img} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover" style={e.position ? { objectPosition: e.position } : undefined} />
+      <Image src={e.img} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="parallax object-cover" style={e.position ? { objectPosition: e.position } : undefined} />
       <div className={`absolute inset-x-0 ${e.light ? "theme-light top-0 p-6 md:p-10" : "bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-28 text-white md:p-10 md:pt-40"}`}>
         <h3 className="t-h2 max-w-md">{e.title}</h3>
         <p className={`mt-3 max-w-sm text-[15px] md:text-[16px] ${e.light ? "text-muted" : "text-white/85"}`}>{e.copy}</p>
@@ -66,13 +66,12 @@ export default function HomePage() {
   const logoFirst = (list: Product[]) => [...list].sort((a, b) => Number(hasLogo(b.brand)) - Number(hasLogo(a.brand)));
   const exclusives = getCollectionProducts(getCollectionDef("only-at-jd")!).filter((p) => p.category !== "Accessories");
 
-  const count = (pred: (p: Product) => boolean) => all.filter(pred).length;
   const categories = [
-    { label: "Men's Shoes", href: "/collections/mens-footwear", image: "/campaign/cat-mens-shoes.webp", n: count((p) => p.category === "Footwear" && p.gender === "Men") },
-    { label: "Women's Shoes", href: "/collections/womens-footwear", image: "/campaign/cat-womens-shoes.webp", n: count((p) => p.category === "Footwear" && p.gender === "Women") },
-    { label: "Men's Clothing", href: "/collections/mens-clothing", image: "/campaign/cat-mens-clothing.webp", n: count((p) => p.category === "Clothing" && p.gender === "Men") },
-    { label: "Women's Clothing", href: "/collections/womens-clothing", image: "/campaign/cat-womens-clothing.webp", n: count((p) => p.category === "Clothing" && p.gender === "Women") },
-    { label: "Caps & Accessories", href: "/collections/accessories", image: shopifyImage(getProduct("new-era-toronto-maple-leafs-9forty-a-frame-chrome-black")?.featuredImage.url ?? all.find((p) => p.category === "Accessories")!.featuredImage.url, 800), n: count((p) => p.category === "Accessories") },
+    { label: "Men's Shoes", href: "/collections/mens-footwear", image: "/campaign/cat-mens-shoes.webp" },
+    { label: "Women's Shoes", href: "/collections/womens-footwear", image: "/campaign/cat-womens-shoes.webp" },
+    { label: "Men's Clothing", href: "/collections/mens-clothing", image: "/campaign/cat-mens-clothing.webp" },
+    { label: "Women's Clothing", href: "/collections/womens-clothing", image: "/campaign/cat-womens-clothing.webp" },
+    { label: "Caps & Accessories", href: "/collections/accessories", image: shopifyImage(getProduct("new-era-toronto-maple-leafs-9forty-a-frame-chrome-black")?.featuredImage.url ?? all.find((p) => p.category === "Accessories")!.featuredImage.url, 800) },
   ];
 
   const brandTiles = BRAND_STAGE.map((b) => ({ ...b, count: all.filter((p) => p.brand === b.brand).length }));
@@ -92,7 +91,9 @@ export default function HomePage() {
       <Hero content={HERO} />
 
       <section aria-labelledby="cat-title" className="reveal container-jd pt-12 md:pt-16">
-        <SectionHeading id="cat-title" title="Shop by Category" />
+        <h2 id="cat-title" className="sr-only">
+          Shop by Category
+        </h2>
         <div className="no-scrollbar -mx-8 flex snap-x gap-3 overflow-x-auto overflow-y-hidden px-8 md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-6 md:gap-4">
           {categories.map((c) => (
             <Link key={c.label} href={c.href} className="group w-[42%] shrink-0 snap-start md:w-auto">
@@ -101,7 +102,6 @@ export default function HomePage() {
                 <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
               </div>
               <p className="mt-3 text-[16px] font-bold tracking-[-0.01em] md:text-[18px]">{c.label}</p>
-              <p className="t-meta">{c.n} styles</p>
             </Link>
           ))}
           <Link href="/collections/sale" className="group w-[42%] shrink-0 snap-start md:w-auto">
@@ -114,7 +114,6 @@ export default function HomePage() {
               <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
             </div>
             <p className="mt-3 text-[16px] font-bold tracking-[-0.01em] text-sale md:text-[18px]">Sale</p>
-            <p className="t-meta">{sale.length} styles reduced</p>
           </Link>
         </div>
       </section>

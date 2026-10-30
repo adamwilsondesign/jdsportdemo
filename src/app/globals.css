@@ -60,6 +60,10 @@
   from { opacity: 0; transform: translateY(28px); }
   to { opacity: 1; transform: none; }
 }
+@keyframes parallax-drift {
+  from { transform: translateY(-3%) scale(1.07); }
+  to { transform: translateY(3%) scale(1.07); }
+}
 @keyframes qb-in {
   from { opacity: 0; transform: scale(0.92) translateY(6px); }
   to { opacity: 1; transform: none; }
@@ -227,6 +231,17 @@
     }
   }
 
+  /* Very subtle scroll parallax for campaign imagery: the image drifts a few % slower than the page */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .parallax {
+        animation: parallax-drift linear both;
+        animation-timeline: view();
+        animation-range: cover;
+      }
+    }
+  }
+
   .skeleton {
     background: linear-gradient(90deg, #eee 25%, #f6f6f6 37%, #eee 63%);
     background-size: 400% 100%;
@@ -252,16 +267,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Visible, consistent keyboard focus (brief §2 accessibility) */
-:focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--color-jd-yellow);
-}
-.on-dark :focus-visible,
-.on-dark:focus-visible,
-.theme-dark :focus-visible {
-  outline-color: #fff;
+/* Visible, consistent keyboard focus (brief §2 accessibility).
+   In the base layer so a component can opt out with utilities (e.g. the search input). */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-jd-yellow);
+  }
+  .on-dark :focus-visible,
+  .on-dark:focus-visible,
+  .theme-dark :focus-visible {
+    outline-color: #fff;
+  }
 }
 
 ::selection {

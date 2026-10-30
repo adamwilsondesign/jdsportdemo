@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { CardProduct, CartLine } from "@/lib/types";
-import { FREE_SHIPPING_THRESHOLD, LOW_STOCK_THRESHOLD, RETURNS_SUMMARY, formatMoney, shopifyImage } from "@/lib/format";
+import { FREE_SHIPPING_THRESHOLD, LOW_STOCK_THRESHOLD, formatMoney, shopifyImage } from "@/lib/format";
 import { toMerchandise } from "@/lib/merch";
 import { useStore } from "@/components/providers/StoreProvider";
 import { Overlay } from "@/components/ui/Overlay";
-import { BagIcon, CheckIcon, CloseIcon, EditIcon, HeartIcon, InfoIcon, MinusIcon, PlusIcon, ReturnIcon, TrashIcon, TruckIcon } from "@/components/ui/Icons";
+import { BagIcon, CheckIcon, CloseIcon, EditIcon, HeartIcon, InfoIcon, MinusIcon, PlusIcon, TrashIcon, TruckIcon } from "@/components/ui/Icons";
 import { PaymentIcons } from "@/components/ui/PaymentIcons";
 import { Price } from "@/components/product/bits";
 
@@ -86,9 +86,9 @@ function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
   const label = `${m.product.brand} ${m.product.model}`;
 
   return (
-    <li className={`${compact ? "py-6" : "py-5"} ${isNew ? "animate-rise" : ""}`}>
+    <li className={`${compact ? "py-5" : "py-5"} ${isNew ? "animate-rise" : ""}`}>
       <div className="flex gap-4">
-        <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className={`relative shrink-0 bg-image ${compact ? "h-[150px] w-[120px]" : "h-32 w-32 md:h-40 md:w-40"}`}>
+        <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className={`relative shrink-0 bg-image ${compact ? "h-[120px] w-[96px]" : "h-32 w-32 md:h-40 md:w-40"}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={shopifyImage(m.product.image, 320)} alt="" className="h-full w-full object-cover" />
         </Link>
@@ -126,7 +126,7 @@ function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
             m.quantityAvailable <= LOW_STOCK_THRESHOLD && <p className="mt-1.5 text-[12px] font-semibold text-warn">Only {m.quantityAvailable} left in size {m.title}</p>
           )}
 
-          <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <div className={`mt-auto flex items-center justify-between gap-2 ${compact ? "pt-2" : "pt-3"}`}>
             <div className="flex h-9 items-center border border-line" role="group" aria-label={`Quantity for ${label}`}>
               <button type="button" onClick={() => (line.quantity === 1 ? removeLine(line.id) : updateQuantity(line.id, line.quantity - 1))} className="grid h-full w-9 place-items-center hover:bg-surface" aria-label={line.quantity === 1 ? `Remove ${label}` : "Decrease quantity"}>
                 <MinusIcon size={14} />
@@ -280,18 +280,21 @@ export function CartSummary({ onCheckout, compact }: { onCheckout?: () => void; 
             <dd className="t-price">−{formatMoney(savings)}</dd>
           </div>
         )}
-        <div className="flex justify-between">
-          <dt className="flex items-center gap-1">
-            Shipping
-            <button type="button" onClick={() => setWhy((w) => !w)} aria-expanded={why} aria-label="Why are shipping and tax calculated at checkout?" className="grid h-6 w-6 place-items-center text-muted">
-              <InfoIcon size={14} />
-            </button>
-          </dt>
-          <dd className="text-muted">{subtotal >= FREE_SHIPPING_THRESHOLD ? <span className="font-semibold text-success">Free</span> : "Calculated at checkout"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt>Tax</dt>
-          <dd className="text-muted">TBD</dd>
+        {/* Shipping and tax share one line, split by a hairline */}
+        <div className="grid grid-cols-2 divide-x divide-line">
+          <div className="flex items-center justify-between gap-2 pr-4">
+            <dt className="flex items-center gap-1">
+              Shipping
+              <button type="button" onClick={() => setWhy((w) => !w)} aria-expanded={why} aria-label="Why are shipping and tax calculated at checkout?" className="-my-1 grid h-6 w-6 place-items-center text-muted">
+                <InfoIcon size={14} />
+              </button>
+            </dt>
+            <dd className="text-right text-muted">{subtotal >= FREE_SHIPPING_THRESHOLD ? <span className="font-semibold text-success">Free</span> : "At checkout"}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-2 pl-4">
+            <dt>Tax</dt>
+            <dd className="text-muted">TBD</dd>
+          </div>
         </div>
         {why && <p className="animate-fade-in bg-surface p-3 text-[12px] text-muted">Shipping rates and GST/HST/PST depend on your delivery address, so we calculate them at checkout once you enter it.</p>}
         <div className={`flex justify-between border-t border-line text-[15px] font-bold ${compact ? "pt-2" : "pt-3"}`}>
@@ -299,30 +302,25 @@ export function CartSummary({ onCheckout, compact }: { onCheckout?: () => void; 
           <dd className="t-price">{formatMoney(subtotal)}</dd>
         </div>
       </dl>
-      {afterpay && (
-        <p className="mt-2 text-[12px] text-muted">
-          or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((subtotal / 4) * 100) / 100)}</b> with Afterpay
-        </p>
-      )}
-      <Link
-        href="/checkout"
-        onClick={onCheckout}
-        aria-disabled={blocked}
-        className={`btn btn-primary w-full text-[15px] ${compact ? "mt-3" : "mt-4"} ${blocked ? "pointer-events-none opacity-40" : ""}`}
-      >
-        Checkout securely
-      </Link>
-      <Link href="/checkout?express=shop-pay" onClick={onCheckout} className="btn mt-2 h-11 min-h-0 w-full bg-shoppay text-white hover:brightness-110" aria-label="Express checkout with Shop Pay">
-        Buy with <span className="font-extrabold italic tracking-tight">shop</span>
-        <span className="-ml-1.5 rounded-sm bg-white px-1 text-[11px] font-extrabold text-shoppay">Pay</span>
-      </Link>
-      {!compact && <PaymentIcons className="mt-3 justify-center" />}
-      <p className={`flex items-center justify-center gap-1.5 text-[11.5px] text-muted ${compact ? "mt-2.5" : "mt-3"}`}>
-        <ReturnIcon size={14} /> {RETURNS_SUMMARY}.{" "}
-        <Link href="/pages/returns" className="link-underline">
-          Details
+      <div className={`grid grid-cols-2 gap-2 ${compact ? "mt-3" : "mt-4"}`}>
+        <Link href="/checkout" onClick={onCheckout} aria-disabled={blocked} className={`btn btn-primary px-3 text-[15px] ${blocked ? "pointer-events-none opacity-40" : ""}`}>
+          Checkout
         </Link>
-      </p>
+        <Link href="/checkout?express=shop-pay" onClick={onCheckout} className="btn bg-shoppay px-3 text-[15px] text-white hover:brightness-110" aria-label="Express checkout with Shop Pay">
+          ShopPay
+        </Link>
+      </div>
+      {!compact && <PaymentIcons className="mt-3 justify-center" />}
+      {/* Afterpay and returns share one line */}
+      <div className={`grid grid-cols-2 items-center gap-3 text-[11px] text-muted sm:flex sm:justify-between sm:whitespace-nowrap ${compact ? "mt-2.5" : "mt-3"}`}>
+        <p>{afterpay && <>or 4 interest free payments of <b className="text-ink">{formatMoney(Math.round((subtotal / 4) * 100) / 100)}</b></>}</p>
+        <p className="text-right">
+          Full refund for 14 days.{" "}
+          <Link href="/pages/returns" className="link-underline">
+            Details
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
@@ -347,24 +345,22 @@ function CompleteTheLook({ handle }: { handle: string }) {
   return (
     <section aria-label="Complete the look" className="border-t border-line pt-5">
       <h3 className="text-[13px] font-bold">Complete the look</h3>
-      <ul className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto overflow-y-hidden px-5">
+      <ul className="no-scrollbar -mx-5 mt-3 flex snap-x gap-3 overflow-x-auto overflow-y-hidden scroll-px-5 px-5">
         {!items
-          ? [0, 1, 2].map((i) => <li key={i} className="skeleton h-[196px] w-[132px] shrink-0" />)
-          : list.map((p) => {
+          ? [0, 1, 2].map((i) => <li key={i} className="skeleton h-[180px] w-[132px] shrink-0" />)
+          : list.slice(0, 6).map((p) => {
               const available = p.variants.filter((x) => x.available);
               // one-size items add straight away; everything else asks for a size first
               const single = p.variants.length === 1 ? available[0] : undefined;
               const done = added === p.handle;
               const open = picking === p.handle;
               return (
-                <li key={p.handle} className="w-[132px] shrink-0">
-                  <Link href={`/products/${p.handle}`} className="block aspect-square overflow-hidden bg-image">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={shopifyImage(p.image, 280)} alt="" className="h-full w-full object-cover" />
-                  </Link>
-                  <p className="mt-2 truncate text-[12px] font-semibold">{p.model}</p>
-                  <div className="mt-0.5 flex items-center justify-between gap-1">
-                    <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
+                <li key={p.handle} className="w-[132px] shrink-0 snap-start">
+                  <div className="relative">
+                    <Link href={`/products/${p.handle}`} className="block aspect-square overflow-hidden bg-image">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={shopifyImage(p.image, 280)} alt="" className="h-full w-full object-cover" />
+                    </Link>
                     {available.length > 0 && (
                       <button
                         type="button"
@@ -376,11 +372,15 @@ function CompleteTheLook({ handle }: { handle: string }) {
                         }}
                         aria-label={single ? `Add ${p.brand} ${p.model}` : `Choose a size for ${p.brand} ${p.model}`}
                         aria-expanded={single ? undefined : open}
-                        className={`grid h-8 w-8 shrink-0 place-items-center border transition-colors ${done ? "border-success bg-success text-white" : open ? "border-ink bg-ink text-white" : "border-ink hover:bg-ink hover:text-white"}`}
+                        className={`absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center shadow-sm transition-colors ${done ? "bg-success text-white" : open ? "bg-ink text-white" : "bg-white text-ink hover:bg-ink hover:text-white"}`}
                       >
                         {done ? <CheckIcon size={14} /> : <PlusIcon size={14} className={`transition-transform duration-300 ${open ? "rotate-45" : ""}`} />}
                       </button>
                     )}
+                  </div>
+                  <p className="mt-2 truncate text-[12px] font-semibold">{p.model}</p>
+                  <div className="mt-0.5">
+                    <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
                   </div>
                 </li>
               );
@@ -473,7 +473,7 @@ export function CartDrawer() {
               <CompleteTheLook handle={lines[0].merchandise.product.handle} />
             </div>
           </div>
-          <div className="shrink-0 border-t border-line bg-white px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)]">
+          <div className="shrink-0 bg-white px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_24px_-14px_rgba(0,0,0,0.14)]">
             <CartSummary onCheckout={close} compact />
           </div>
         </>

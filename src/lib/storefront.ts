@@ -137,6 +137,11 @@ export function getCompleteTheLook(p: Product, limit = 4) {
     out.push(q);
     if (out.length === limit) break;
   }
+  // top up with the next-best picks when there aren't enough distinct styles
+  for (const { q } of scored) {
+    if (out.length >= limit) break;
+    if (!out.includes(q)) out.push(q);
+  }
   return out;
 }
 

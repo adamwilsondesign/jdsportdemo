@@ -15,6 +15,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ handle:
   return NextResponse.json({
     card: toCard(p),
     siblings: getColourFamily(p).map(toCard),
-    completeTheLook: getCompleteTheLook(p, 3).map(toCard),
+    completeTheLook: getCompleteTheLook(p, 6).map(toCard),
   });
 }

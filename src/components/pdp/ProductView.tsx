@@ -15,10 +15,10 @@ import { FitFinder, Lightbox, NotifyMe, SizeGuide, StorePicker } from "./Modals"
 
 // JD's buy-now-pay-later partners, using the marks from jdsports.ca (tight-cropped in /public/payment-logos)
 const PAY_LATER = [
-  { name: "Afterpay", src: "/payment-logos/afterpay.png", h: 17 },
-  { name: "Shop Pay", src: "/payment-logos/shoppay.png", h: 18 },
-  { name: "Sezzle", src: "/payment-logos/sezzle.png", h: 18 },
-  { name: "PayPal", src: "/payment-logos/paypal.png", h: 19 },
+  { name: "Afterpay", src: "/payment-logos/afterpay.png", h: 8.5 },
+  { name: "Shop Pay", src: "/payment-logos/shoppay.png", h: 9 },
+  { name: "Sezzle", src: "/payment-logos/sezzle.png", h: 9 },
+  { name: "PayPal", src: "/payment-logos/paypal.png", h: 9.5 },
 ];
 
 export type SiblingLite = { handle: string; colourway: string; image: string; sizes: { title: string; available: boolean }[] };
@@ -290,29 +290,9 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
             )}
           </div>
 
-          {/* Price, then the CTA directly beneath it */}
+          {/* Price, then the CTA directly beneath it, then payment options */}
           <div className="mt-4">
             <Price price={price} compareAt={compareAt} size="lg" />
-            <p className="mt-1 text-[12.5px] text-muted">
-              or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((price / 4) * 100) / 100)}</b> with <b className="text-ink">Afterpay</b>
-            </p>
-            {/* Same BNPL options and marks as jdsports.ca */}
-            <div className="mt-3 border-t border-line pt-3">
-              <p className="text-[12.5px]">
-                Buy Now, Pay Later installments available.{" "}
-                <Link href="/pages/buy-now-pay-later" className="link-underline font-semibold">
-                  Learn more
-                </Link>
-              </p>
-              <ul className="mt-2.5 flex items-center justify-between gap-x-3 sm:justify-start sm:gap-x-7" aria-label="Buy now, pay later options">
-                {PAY_LATER.map((m) => (
-                  <li key={m.name}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- tiny static marks */}
-                    <img src={m.src} alt={m.name} height={m.h} style={{ height: m.h, width: "auto" }} loading="lazy" />
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
 
           <div ref={ctaRef} className="mt-4 flex gap-2">
@@ -334,6 +314,29 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
               </button>
             )}
             <FavouriteButton handle={product.handle} label={label} className="!h-14 !w-14 border border-line hover:border-ink" size={22} />
+          </div>
+
+          <div className="mt-3">
+            <p className="text-[12.5px] text-muted">
+              or 4 interest-free payments of <b className="text-ink">{formatMoney(Math.round((price / 4) * 100) / 100)}</b> with <b className="text-ink">Afterpay</b>
+            </p>
+            {/* Same BNPL options and marks as jdsports.ca */}
+            <div className="mt-3 border-t border-line pt-3">
+              <p className="text-[12.5px]">
+                Buy Now, Pay Later installments available.{" "}
+                <Link href="/pages/buy-now-pay-later" className="link-underline font-semibold">
+                  Learn more
+                </Link>
+              </p>
+              <ul className="mt-2 flex items-center gap-x-5" aria-label="Buy now, pay later options">
+                {PAY_LATER.map((m) => (
+                  <li key={m.name}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- tiny static marks */}
+                    <img src={m.src} alt={m.name} height={m.h} style={{ height: m.h, width: "auto" }} loading="lazy" />
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Key benefits below the CTA */}
