@@ -45,7 +45,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 ### Brand assets
 
 - `public/brand-logos/`: brand marks taken from JD Canada's own brands page (`jdsports.ca/pages/brands`), tight-cropped so they size consistently. The Reebok mark comes from Simple Icons (CC0). EA7, HOKA and Sonneti have no mark yet and fall back to text.
-- `public/brand-cutouts/`: six hero shoes for the Shop by Brand stage. They were cut from JD's product photos with a one-off background-removal pass (rembg), which is not part of the build.
+- `public/brand-cutouts/`: six hero shoes for the Shop Featured Brands stage. They were cut from JD's product photos with a one-off background-removal pass (rembg), which is not part of the build.
 
 ### Demo data (not public on jdsports.ca)
 
@@ -68,7 +68,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Four-up product rows (matching the PLP grid) for New Arrivals, Only at JD and Sale, each with one "View all (N)" link and no tabs or pagination.
 - The whole page sits on black (`.theme-dark` re-points the neutral tokens).
 - Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
-- **Shop by Brand** tiles using brand logos.
+- **Shop Featured Brands** tiles using brand logos.
 - Store module, and a footer with a giant JD watermark.
 - Compact remembered **country confirmation** instead of a blocking modal.
 
@@ -85,7 +85,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 **Product cards**
 - Brand logo over the image (no mark taller than the Nike swoosh); model, colourway, price and rating in a tight block.
 - Sale, New and low-stock tags over the image.
-- Colour dots that switch the card's image, price and availability.
+- Colour bars (short 8:1 strips, white border, yellow when selected) that switch the card's image, price and availability.
 - Hover effects (instant alternate angle, Quick Buy) apply to the image only.
 - In-place **Quick Buy**; its "Added" confirmation opens the cart.
 

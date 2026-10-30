@@ -120,13 +120,13 @@ export default function HomePage() {
 
       <ProductRow id="new" title="New Arrivals" products={logoFirst(dedupe(newArrivals).filter((p) => p.category !== "Accessories")).map(toCard)} viewAll={{ href: "/collections/new-arrivals", count: newArrivals.length }} />
 
-      {/* Shop by Brand — a full-bleed black stage: cut-out hero shoes, white marks */}
+      {/* Shop Featured Brands — a full-bleed black stage: cut-out hero shoes, white marks */}
       <section aria-labelledby="brand-title" className="on-dark relative mb-12 overflow-hidden border-y border-line bg-ink py-14 text-white md:mb-16 md:py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,238,0,0.10),transparent_60%)]" aria-hidden />
         <div className="container-jd relative">
           <div className="mb-8 flex items-end justify-between gap-6 md:mb-10">
             <h2 id="brand-title" className="t-h1">
-              Shop by Brand
+              Shop Featured Brands
             </h2>
             <Link href="/collections/all" className="group inline-flex shrink-0 items-center gap-1.5 text-[13px] font-bold">
               <span className="link-underline">All brands</span>

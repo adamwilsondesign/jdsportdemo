@@ -118,7 +118,8 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
           </div>
         </Link>
         {swatches.length > 1 && (
-          <div className="mt-2.5 flex items-center gap-2" role="group" aria-label={`${swatches.length} colours`}>
+          // Short colour bars butted together: white border keeps dark colours visible on black, yellow marks the selection
+          <div className="mt-2 flex items-center" role="group" aria-label={`${swatches.length} colours`}>
             {swatches.slice(0, 5).map((s) => (
               <button
                 key={s.handle}
@@ -127,12 +128,15 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
                 aria-label={`Show colour ${s.colourway}`}
                 aria-pressed={s.handle === activeHandle}
                 title={s.colourway}
-                className={`grid h-5 w-5 place-items-center rounded-full transition-shadow ${s.handle === activeHandle ? "ring-1 ring-current ring-offset-2 ring-offset-transparent" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2 hover:ring-offset-transparent"}`}
+                className="group/sw relative py-2"
               >
-                <span className="h-4 w-4 rounded-full border border-black/15" style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }} />
+                <span
+                  className={`block h-[6px] w-12 border transition-colors ${s.handle === activeHandle ? "relative z-10 border-jd-yellow" : "border-white shadow-[0_0_0_1px_rgba(0,0,0,0.12)] group-hover/sw:border-jd-yellow/60"}`}
+                  style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }}
+                />
               </button>
             ))}
-            <span className="t-meta text-[11.5px]">{swatches.length} colours</span>
+            <span className="t-meta ml-3 text-[11.5px]">{swatches.length} colours</span>
           </div>
         )}
       </div>
