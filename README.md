@@ -65,7 +65,8 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 **Home**
 - One shoppable campaign hero (no carousel) with a single named CTA, kept short so the next section shows above the fold.
 - "Shop by Category" with a yellow wipe hover.
-- Five-up product rows for New Arrivals, Only at JD and Sale, each with one "View all (N)" link and no tabs or pagination.
+- Four-up product rows (matching the PLP grid) for New Arrivals, Only at JD and Sale, each with one "View all (N)" link and no tabs or pagination.
+- The whole page sits on black (`.theme-dark` re-points the neutral tokens).
 - Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
 - **Shop by Brand** tiles using brand logos.
 - Store module, and a footer with a giant JD watermark.

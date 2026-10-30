@@ -21,9 +21,9 @@ export function Hero({ content }: { content: HeroContent }) {
         <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/80 via-black/35 to-transparent sm:h-1/2" />
         <div className="container-jd absolute inset-x-0 bottom-0 pb-6 sm:pb-10">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-xl animate-rise">
+            <div className="max-w-3xl animate-rise">
               <p className="t-eyebrow text-jd-yellow">{content.eyebrow}</p>
-              <h1 className="mt-2 text-xl font-bold leading-snug sm:text-2xl">{content.headline}</h1>
+              <h1 className="mt-3 text-[26px] font-bold leading-[1.08] tracking-[-0.015em] sm:text-[34px] lg:text-[42px]">{content.headline}</h1>
             </div>
             <Link href={content.cta.href} className="btn btn-yellow h-12 self-start md:self-auto">
               {content.cta.label}

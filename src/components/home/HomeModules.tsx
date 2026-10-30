@@ -35,7 +35,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
                 <span className="absolute inset-0 animate-ping rounded-full bg-white/60 [animation-duration:2.4s] motion-reduce:hidden" aria-hidden />
                 <PlusIcon size={16} className={`relative transition-transform ${active === i ? "rotate-45" : ""}`} />
               </span>
-              <span className={`pointer-events-none absolute left-11 top-1/2 hidden w-max -translate-y-1/2 bg-white px-3 py-2 text-[12px] font-semibold shadow-lg transition-opacity md:block ${active === i ? "opacity-100" : "opacity-0"}`}>
+              <span className={`pointer-events-none absolute left-11 top-1/2 hidden w-max -translate-y-1/2 bg-white px-3 py-2 text-[12px] font-semibold text-ink shadow-lg transition-opacity md:block ${active === i ? "opacity-100" : "opacity-0"}`}>
                 {h.product.model} · {formatMoney(h.product.price)}
               </span>
             </Link>
@@ -49,7 +49,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
           <ol className="mt-8 divide-y divide-line border-y border-line">
             {hotspots.map((h, i) => (
               <li key={h.product.handle} onMouseEnter={() => setActive(i)} onMouseLeave={() => setActive(null)}>
-                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 px-2 py-3 transition-colors ${active === i ? "bg-white" : ""}`}>
+                <Link href={`/products/${h.product.handle}`} className={`flex items-center gap-4 px-2 py-3 transition-colors ${active === i ? "bg-white/[0.06]" : ""}`}>
                   <span className="w-5 text-center text-[12px] font-bold tabular-nums text-muted">{i + 1}</span>
                   <span className="h-16 w-16 shrink-0 bg-image">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -67,7 +67,7 @@ export function ShoppableLook({ image, title, copy, hotspots, cta }: { image: st
               </li>
             ))}
           </ol>
-          <Link href={cta.href} className="btn btn-primary mt-6">
+          <Link href={cta.href} className="btn btn-yellow mt-6">
             {cta.label}
           </Link>
         </div>

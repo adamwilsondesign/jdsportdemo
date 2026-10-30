@@ -153,7 +153,7 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
         <section aria-label="Product details and purchase" className="min-w-0 lg:pt-1">
           <div className="flex items-start justify-between gap-4">
             <Link href={`/collections/${slugify(product.brand)}`} className="inline-block text-ink hover:opacity-70" aria-label={`More from ${product.brand}`}>
-              <BrandLogo brand={product.brand} size={40} className="text-[13px] tracking-[0.06em]" />
+              <BrandLogo brand={product.brand} size={68} className="text-[18px] tracking-[0.06em]" />
             </Link>
             {product.reviews && (
               <a href="#reviews" className="flex items-center gap-1.5 text-[12.5px] font-semibold hover:underline">
@@ -162,8 +162,8 @@ export function ProductView({ product, siblings }: { product: Product; siblings:
               </a>
             )}
           </div>
-          <h1 className="mt-3 text-[26px] font-bold leading-[1.1] tracking-tight md:text-[30px]">{product.model}</h1>
-          <p className="mt-1 text-[14px] text-muted">{product.colourway}</p>
+          <h1 className="mt-4 text-[34px] font-bold leading-[1.02] tracking-[-0.02em] md:text-[46px]">{product.model}</h1>
+          <p className="mt-2 text-[15px] text-muted md:text-[16px]">{product.colourway}</p>
           {product.exclusive && (
             <p className="mt-2 text-[12.5px]">
               <b>Only at JD</b> <span className="text-muted">— exclusive colourway</span>

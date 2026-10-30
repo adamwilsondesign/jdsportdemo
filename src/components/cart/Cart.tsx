@@ -14,9 +14,36 @@ import { Price } from "@/components/product/bits";
 // ---------------------------------------------------------------------------
 // Free shipping progress — dollar-based, accessible (brief §6.C.2)
 // ---------------------------------------------------------------------------
-export function FreeShippingProgress({ subtotal }: { subtotal: number }) {
+export function FreeShippingProgress({ subtotal, inline }: { subtotal: number; inline?: boolean }) {
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const pct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  if (inline)
+    // Drawer header: one short line of copy over a hairline progress bar
+    return (
+      <div className="min-w-0">
+        <p className="flex items-center gap-1.5 truncate text-[12px] font-semibold" aria-live="polite">
+          {remaining > 0 ? (
+            <>
+              <TruckIcon size={15} className="shrink-0" /> <span className="truncate"><span className="t-price">{formatMoney(remaining)}</span> away from free shipping</span>
+            </>
+          ) : (
+            <>
+              <CheckIcon size={15} className="shrink-0 text-success" /> <span className="truncate">Your order qualifies for free shipping</span>
+            </>
+          )}
+        </p>
+        <div
+          className="mt-1.5 h-[3px] overflow-hidden bg-line"
+          role="progressbar"
+          aria-label="Progress to free standard shipping"
+          aria-valuemin={0}
+          aria-valuemax={FREE_SHIPPING_THRESHOLD}
+          aria-valuenow={Math.min(subtotal, FREE_SHIPPING_THRESHOLD)}
+        >
+          <div className={`h-full transition-[width] duration-500 ease-[var(--ease-out-soft)] ${remaining > 0 ? "bg-ink" : "bg-success"}`} style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+    );
   return (
     <div>
       <p className="flex items-center gap-2 text-[13px] font-semibold" aria-live="polite">
@@ -59,9 +86,9 @@ function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
   const label = `${m.product.brand} ${m.product.model}`;
 
   return (
-    <li className={`py-5 ${isNew ? "animate-rise" : ""}`}>
+    <li className={`${compact ? "py-6" : "py-5"} ${isNew ? "animate-rise" : ""}`}>
       <div className="flex gap-4">
-        <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className={`relative shrink-0 bg-image ${compact ? "h-[104px] w-[104px]" : "h-32 w-32 md:h-40 md:w-40"}`}>
+        <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className={`relative shrink-0 bg-image ${compact ? "h-[150px] w-[120px]" : "h-32 w-32 md:h-40 md:w-40"}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={shopifyImage(m.product.image, 320)} alt="" className="h-full w-full object-cover" />
         </Link>
@@ -69,12 +96,12 @@ function LineItem({ line, compact }: { line: CartLine; compact?: boolean }) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="t-eyebrow text-[10px] text-muted">{m.product.brand}</p>
-              <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className="block text-[14px] font-semibold leading-snug hover:underline">
+              <Link href={`/products/${m.product.handle}`} onClick={() => setCartOpen(false)} className="mt-0.5 block text-[15px] font-semibold leading-tight hover:underline">
                 {m.product.model}
               </Link>
             </div>
             <div className="text-right">
-              <p className="t-price text-[14px]">{formatMoney(unit * line.quantity)}</p>
+              <p className="t-price text-[15px]">{formatMoney(unit * line.quantity)}</p>
               {cmp && <s className="t-price block text-[12px] font-normal text-subtle">{formatMoney(cmp * line.quantity)}</s>}
             </div>
           </div>
@@ -307,6 +334,7 @@ function CompleteTheLook({ handle }: { handle: string }) {
   const [items, setItems] = useState<CardProduct[] | null>(null);
   const { addToCart, lines } = useStore();
   const [added, setAdded] = useState<string | null>(null);
+  const [picking, setPicking] = useState<string | null>(null);
   useEffect(() => {
     fetch(`/api/products/${handle}`)
       .then((r) => r.json())
@@ -323,8 +351,11 @@ function CompleteTheLook({ handle }: { handle: string }) {
         {!items
           ? [0, 1, 2].map((i) => <li key={i} className="skeleton h-[196px] w-[132px] shrink-0" />)
           : list.map((p) => {
-              const v = p.variants.find((x) => x.available && (x.title === "M" || x.title === "10" || x.title === "One Size")) ?? p.variants.find((x) => x.available);
+              const available = p.variants.filter((x) => x.available);
+              // one-size items add straight away; everything else asks for a size first
+              const single = p.variants.length === 1 ? available[0] : undefined;
               const done = added === p.handle;
+              const open = picking === p.handle;
               return (
                 <li key={p.handle} className="w-[132px] shrink-0">
                   <Link href={`/products/${p.handle}`} className="block aspect-square overflow-hidden bg-image">
@@ -334,18 +365,20 @@ function CompleteTheLook({ handle }: { handle: string }) {
                   <p className="mt-2 truncate text-[12px] font-semibold">{p.model}</p>
                   <div className="mt-0.5 flex items-center justify-between gap-1">
                     <Price price={p.price} compareAt={p.compareAt} size="sm" showSaving={false} />
-                    {v && (
+                    {available.length > 0 && (
                       <button
                         type="button"
                         onClick={() => {
-                          addToCart(toMerchandise(p, p, v), 1, { openDrawer: false });
-                          setAdded(p.handle);
+                          if (single) {
+                            addToCart(toMerchandise(p, p, single), 1, { openDrawer: false });
+                            setAdded(p.handle);
+                          } else setPicking(open ? null : p.handle);
                         }}
-                        aria-label={`Add ${p.brand} ${p.model}, size ${v.title}`}
-                        title={`Add size ${v.title}`}
-                        className={`grid h-8 w-8 shrink-0 place-items-center border transition-colors ${done ? "border-success bg-success text-white" : "border-ink hover:bg-ink hover:text-white"}`}
+                        aria-label={single ? `Add ${p.brand} ${p.model}` : `Choose a size for ${p.brand} ${p.model}`}
+                        aria-expanded={single ? undefined : open}
+                        className={`grid h-8 w-8 shrink-0 place-items-center border transition-colors ${done ? "border-success bg-success text-white" : open ? "border-ink bg-ink text-white" : "border-ink hover:bg-ink hover:text-white"}`}
                       >
-                        {done ? <CheckIcon size={14} /> : <PlusIcon size={14} />}
+                        {done ? <CheckIcon size={14} /> : <PlusIcon size={14} className={`transition-transform duration-300 ${open ? "rotate-45" : ""}`} />}
                       </button>
                     )}
                   </div>
@@ -353,6 +386,40 @@ function CompleteTheLook({ handle }: { handle: string }) {
               );
             })}
       </ul>
+      {(() => {
+        const p = list.find((x) => x.handle === picking);
+        if (!p) return null;
+        return (
+          <div className="mt-3 animate-rise border border-line bg-surface p-3" role="group" aria-label={`Select a size for ${p.model}`}>
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <p className="min-w-0 truncate text-[12px] font-semibold">
+                Select size <span className="font-normal text-muted">· {p.model}</span>
+              </p>
+              <button type="button" onClick={() => setPicking(null)} aria-label="Close size picker" className="-m-2 grid h-9 w-9 shrink-0 place-items-center transition-transform duration-300 hover:rotate-90">
+                <CloseIcon size={14} />
+              </button>
+            </div>
+            <div className={`grid gap-1 ${p.variants.length > 12 ? "grid-cols-6" : "grid-cols-5"}`}>
+              {p.variants.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  disabled={!v.available}
+                  onClick={() => {
+                    addToCart(toMerchandise(p, p, v), 1, { openDrawer: false });
+                    setAdded(p.handle);
+                    setPicking(null);
+                  }}
+                  aria-label={v.available ? `Add size ${v.title}` : `Size ${v.title} sold out`}
+                  className={`h-9 border text-[12px] font-semibold tabular-nums transition-colors ${v.available ? "border-line bg-white hover:border-ink hover:bg-ink hover:text-white" : "cursor-not-allowed border-line bg-white text-subtle line-through"}`}
+                >
+                  {v.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </section>
   );
 }
@@ -384,12 +451,11 @@ export function CartDrawer() {
   const { cartOpen, setCartOpen, lines, totalQuantity, subtotal, hydrated } = useStore();
   const close = () => setCartOpen(false);
   return (
-    <Overlay open={cartOpen} onClose={close} side="right" label={`Your cart, ${totalQuantity} items`}>
-      <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-5">
-        <h2 className="text-[15px] font-extrabold uppercase tracking-wide">
-          Your cart <span className="tabular-nums">({hydrated ? totalQuantity : 0})</span>
-        </h2>
-        <button type="button" onClick={close} aria-label="Close cart" className="-mr-2 grid h-11 w-11 place-items-center" data-autofocus>
+    <Overlay open={cartOpen} onClose={close} side="right" label={`Cart, ${hydrated ? totalQuantity : 0} items`}>
+      <div className="flex h-16 shrink-0 items-center gap-5 border-b border-line px-5">
+        <h2 className="text-[22px] font-extrabold uppercase leading-none tracking-[-0.01em]">Cart</h2>
+        <div className="min-w-0 flex-1">{lines.length > 0 && <FreeShippingProgress subtotal={subtotal} inline />}</div>
+        <button type="button" onClick={close} aria-label="Close cart" className="-mr-2 grid h-11 w-11 shrink-0 place-items-center transition-transform duration-300 hover:rotate-90" data-autofocus>
           <CloseIcon />
         </button>
       </div>
@@ -397,9 +463,6 @@ export function CartDrawer() {
         <EmptyCart onClose={close} />
       ) : (
         <>
-          <div className="shrink-0 border-b border-line px-5 py-4">
-            <FreeShippingProgress subtotal={subtotal} />
-          </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-5">
             <ul className="divide-y divide-line">
               {lines.map((l) => (

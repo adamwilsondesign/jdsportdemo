@@ -89,22 +89,22 @@
     text-transform: uppercase;
     letter-spacing: -0.01em;
     line-height: 1;
-    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    font-size: clamp(2.125rem, 4.4vw, 4rem);
   }
   .t-h2 {
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: -0.005em;
-    line-height: 1.05;
-    font-size: clamp(1.375rem, 2.2vw, 1.875rem);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    font-size: clamp(1.75rem, 3.3vw, 2.875rem);
   }
   .t-h3 {
     font-weight: 700;
-    line-height: 1.25;
-    font-size: 1.0625rem;
+    line-height: 1.2;
+    font-size: 1.25rem;
   }
   .t-body {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     line-height: 1.6;
   }
   .t-small {
@@ -125,6 +125,29 @@
   .t-price {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
+  }
+
+  /* Dark surface theme (homepage): re-points the neutral tokens so every
+     component inside reads white-on-black without per-component overrides. */
+  .theme-dark {
+    --color-muted: #a6a6a6;
+    --color-subtle: #7d7d7d;
+    --color-line: rgba(255, 255, 255, 0.14);
+    --color-line-strong: rgba(255, 255, 255, 0.32);
+    --color-surface: #161616;
+    --color-sale: #ff4545;
+    background: var(--color-ink);
+    color: #fff;
+  }
+  /* Pop-overs inside a dark section (quick buy, tooltips) snap back to the light tokens */
+  .theme-light {
+    --color-muted: #5c5c5c;
+    --color-subtle: #8a8a8a;
+    --color-line: #e3e3e3;
+    --color-line-strong: #c9c9c9;
+    --color-surface: #f5f5f5;
+    --color-sale: #d70000;
+    color: var(--color-ink);
   }
 
   .container-jd {
@@ -239,7 +262,8 @@ body {
   box-shadow: 0 0 0 4px var(--color-jd-yellow);
 }
 .on-dark :focus-visible,
-.on-dark:focus-visible {
+.on-dark:focus-visible,
+.theme-dark :focus-visible {
   outline-color: #fff;
 }
 

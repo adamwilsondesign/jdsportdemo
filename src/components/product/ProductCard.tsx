@@ -98,15 +98,15 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
         <Link href={href} className="group/title block">
           <span className="sr-only">{product.brand} </span>
           <div className="flex items-baseline justify-between gap-3">
-            <h3 className="min-w-0 truncate text-[14px] font-semibold leading-snug decoration-1 underline-offset-2 group-hover/title:underline" title={product.model}>
+            <h3 className="min-w-0 truncate text-[15px] font-semibold leading-tight tracking-[-0.01em] md:text-[17px] decoration-1 underline-offset-2 group-hover/title:underline" title={product.model}>
               {product.model}
             </h3>
             <span className="shrink-0">
-              <Price price={active.price} compareAt={active.compareAt} size="sm" showSaving={false} />
+              <Price price={active.price} compareAt={active.compareAt} size="card" showSaving={false} />
             </span>
           </div>
-          <div className="mt-0.5 flex items-baseline justify-between gap-3">
-            <p className="min-w-0 truncate text-[12.5px] text-muted">{active.colourway}</p>
+          <div className="mt-1 flex items-baseline justify-between gap-3">
+            <p className="min-w-0 truncate text-[13px] text-muted md:text-[14px]">{active.colourway}</p>
             {product.reviews && (
               <span className="flex shrink-0 items-center gap-1 text-[12px] font-semibold tabular-nums">
                 <StarIcon size={11} />
@@ -127,7 +127,7 @@ export function ProductCard({ product, priority, sizes = "(min-width:1280px) 22v
                 aria-label={`Show colour ${s.colourway}`}
                 aria-pressed={s.handle === activeHandle}
                 title={s.colourway}
-                className={`grid h-5 w-5 place-items-center rounded-full transition-shadow ${s.handle === activeHandle ? "ring-1 ring-ink ring-offset-2" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2"}`}
+                className={`grid h-5 w-5 place-items-center rounded-full transition-shadow ${s.handle === activeHandle ? "ring-1 ring-current ring-offset-2 ring-offset-transparent" : "hover:ring-1 hover:ring-line-strong hover:ring-offset-2 hover:ring-offset-transparent"}`}
               >
                 <span className="h-4 w-4 rounded-full border border-black/15" style={{ background: COLOUR_SWATCH[s.colourFamily] ?? "#bbb" }} />
               </button>
@@ -206,7 +206,7 @@ function QuickBuyPanel({ product, swatch, onClose }: { product: CardProduct; swa
     );
   }
   return (
-    <div className="relative max-h-full w-full origin-bottom-right animate-[qb-in_260ms_var(--ease-out-soft)_both] overflow-y-auto bg-white p-3 shadow-[0_10px_30px_rgba(0,0,0,0.16)]" role="group" aria-label="Select a size">
+    <div className="relative max-h-full w-full origin-bottom-right animate-[qb-in_260ms_var(--ease-out-soft)_both] overflow-y-auto bg-white p-3 theme-light shadow-[0_10px_30px_rgba(0,0,0,0.16)]" role="group" aria-label="Select a size">
       <div className="mb-2.5 flex items-center justify-between pr-8">
         <span className="text-[12px] font-semibold">Select size{product.category === "Footwear" ? <span className="font-normal text-muted"> · {product.gender === "Women" ? "Women's" : "Men's"} US</span> : null}</span>
       </div>

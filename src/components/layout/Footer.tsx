@@ -18,7 +18,7 @@ export function Footer() {
       {/* Brand moment: oversized roundel watermark */}
       <JDLogo
         size={900}
-        className="pointer-events-none absolute -bottom-[22%] -right-[8%] h-auto w-[min(900px,85vw)] text-white opacity-[0.07] md:-bottom-[30%] md:-right-[4%]"
+        className="pointer-events-none absolute -bottom-[22%] -right-[8%] h-auto w-[min(900px,85vw)] text-white opacity-[0.056] md:-bottom-[30%] md:-right-[4%]"
       />
 
       <div className="relative border-b border-white/10">

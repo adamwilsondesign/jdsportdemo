@@ -15,6 +15,7 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
   const { totalQuantity, hydrated, setCartOpen, favourites } = useStore();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [compact, setCompact] = useState(false);
   const pathname = usePathname();
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,6 +23,7 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
   useEffect(() => {
     setOpenMenu(null);
     setMobileOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -61,12 +63,13 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
           </Link>
 
           <nav aria-label="Main" className="ml-6 hidden h-full lg:block">
-            <ul className="flex h-full items-stretch">
+            {/* Hover: hovered item turns yellow with the yellow underline; the rest recede */}
+            <ul className="flex h-full items-stretch [&:has(a:hover)_a:not(:hover)]:opacity-60">
               {NAV.map((item) => (
                 <li key={item.label} className="flex" onMouseEnter={() => intent(item.columns ? item.label : null)}>
                   <Link
                     href={item.href}
-                    className={`relative flex items-center px-3 text-[13px] font-bold tracking-[0.01em] xl:px-4 ${item.tone === "sale" ? "text-[#ff5a5a]" : "text-white"} after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-jd-yellow after:transition-transform hover:after:scale-x-100 xl:after:inset-x-4 ${openMenu === item.label ? "after:scale-x-100" : ""}`}
+                    className={`relative flex items-center px-3 text-[13px] font-bold tracking-[0.01em] transition-[opacity,color] duration-200 hover:text-jd-yellow xl:px-4 ${item.tone === "sale" ? "text-[#ff5a5a]" : "text-white"} after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-jd-yellow after:transition-transform hover:after:scale-x-100 xl:after:inset-x-4 ${openMenu === item.label ? "after:scale-x-100" : ""}`}
                   >
                     {item.label}
                   </Link>
@@ -87,9 +90,21 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
-            <div className="mr-2 hidden w-[300px] lg:block xl:w-[340px]">
-              <SearchBox brands={brands} />
+            {/* Search collapses to an icon; clicking expands the field in place */}
+            <div className={`mr-1 hidden items-center transition-[width] duration-300 ease-[var(--ease-out-soft)] lg:flex ${searchOpen ? "w-[300px] xl:w-[340px]" : "w-11"}`}>
+              {searchOpen ? (
+                <div className="w-full animate-fade-in">
+                  <SearchBox brands={brands} autoFocus onClose={() => setSearchOpen(false)} />
+                </div>
+              ) : (
+                <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" aria-expanded={false} className="grid h-11 w-11 place-items-center transition-colors hover:text-jd-yellow">
+                  <SearchIcon />
+                </button>
+              )}
             </div>
+            <button type="button" onClick={() => setSearchOpen((o) => !o)} aria-label={searchOpen ? "Close search" : "Search"} aria-expanded={searchOpen} className="grid h-11 w-11 place-items-center lg:hidden">
+              {searchOpen ? <CloseIcon /> : <SearchIcon />}
+            </button>
             <Link href="/account" className="hidden h-11 w-11 place-items-center md:grid" aria-label="Account">
               <UserIcon />
             </Link>
@@ -113,10 +128,12 @@ export function Header({ brands }: { brands: { name: string; count: number }[] }
           </div>
         </div>
 
-        {/* mobile search row — search stays one tap away on small screens */}
-        <div className={`container-jd pb-2.5 lg:hidden ${compact ? "hidden" : ""}`}>
-          <SearchBox brands={brands} />
-        </div>
+        {/* mobile: the search icon drops a field down under the header */}
+        {searchOpen && (
+          <div className="container-jd animate-fade-in pb-2.5 lg:hidden">
+            <SearchBox brands={brands} autoFocus onClose={() => setSearchOpen(false)} />
+          </div>
+        )}
 
         {/* Mega menu */}
         {active?.columns && (
@@ -266,7 +283,7 @@ const CATEGORY_LINKS = [
   { label: "Sale", href: "/collections/sale", k: "sale deals discount clearance" },
 ];
 
-function SearchBox({ brands }: { brands: { name: string; count: number }[] }) {
+function SearchBox({ brands, autoFocus, onClose }: { brands: { name: string; count: number }[]; autoFocus?: boolean; onClose?: () => void }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [focused, setFocused] = useState(false);
@@ -281,7 +298,12 @@ function SearchBox({ brands }: { brands: { name: string; count: number }[] }) {
   };
 
   useEffect(() => {
-    const onDoc = (e: MouseEvent) => !wrap.current?.contains(e.target as Node) && setFocused(false);
+    const onDoc = (e: MouseEvent) => {
+      if (wrap.current?.contains(e.target as Node)) return;
+      setFocused(false);
+      // collapse back to the icon when the shopper clicks away from an empty field
+      if (!wrap.current?.querySelector("input")?.value) onClose?.();
+    };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
@@ -348,14 +370,18 @@ function SearchBox({ brands }: { brands: { name: string; count: number }[] }) {
               } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 setCursor((c) => Math.max(c - 1, -1));
-              } else if (e.key === "Escape") setFocused(false);
+              } else if (e.key === "Escape") {
+                setFocused(false);
+                onClose?.();
+              }
             }}
             role="combobox"
             aria-expanded={showPanel}
             aria-controls={listId}
             aria-activedescendant={cursor >= 0 ? `opt-${options[cursor]?.key}` : undefined}
             placeholder="Search products, brands or styles"
-            className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[14px] outline-none placeholder:text-subtle [&::-webkit-search-cancel-button]:hidden"
+            autoFocus={autoFocus}
+            className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[14px] outline-none focus-visible:shadow-none focus-visible:outline-none placeholder:text-subtle [&::-webkit-search-cancel-button]:hidden"
           />
           {q && (
             <button type="button" onClick={() => setQ("")} aria-label="Clear search" className="grid h-10 w-10 place-items-center text-muted">

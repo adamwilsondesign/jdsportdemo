@@ -6,9 +6,9 @@ import { HeartIcon, StarIcon } from "@/components/ui/Icons";
 import { useStore } from "@/components/providers/StoreProvider";
 
 /** Sale hierarchy (brief §4.B.5): sale price → original → saving, one consistent pattern everywhere. */
-export function Price({ price, compareAt, size = "md", showSaving = true }: { price: number; compareAt: number | null; size?: "sm" | "md" | "lg"; showSaving?: boolean }) {
+export function Price({ price, compareAt, size = "md", showSaving = true }: { price: number; compareAt: number | null; size?: "sm" | "md" | "card" | "lg"; showSaving?: boolean }) {
   const pct = percentOff(price, compareAt);
-  const text = size === "lg" ? "text-xl" : size === "sm" ? "text-[13px]" : "text-sm";
+  const text = size === "lg" ? "text-[26px] md:text-[30px]" : size === "card" ? "text-[15px] md:text-[17px]" : size === "sm" ? "text-[13px]" : "text-sm";
   if (!pct || !compareAt) return <span className={`t-price ${text}`}>{formatMoney(price)}</span>;
   return (
     <span className={`inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5 ${text}`}>

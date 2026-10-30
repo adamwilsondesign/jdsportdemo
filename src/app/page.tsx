@@ -34,9 +34,9 @@ function EditorialCard({ e }: { e: Editorial }) {
   return (
     <div className="relative aspect-[4/5] overflow-hidden bg-image md:aspect-[5/6]">
       <Image src={e.img} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover" style={e.position ? { objectPosition: e.position } : undefined} />
-      <div className={`absolute inset-x-0 ${e.light ? "top-0 p-6 md:p-10" : "bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-28 text-white md:p-10 md:pt-40"}`}>
+      <div className={`absolute inset-x-0 ${e.light ? "theme-light top-0 p-6 md:p-10" : "bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-28 text-white md:p-10 md:pt-40"}`}>
         <h3 className="t-h2 max-w-md">{e.title}</h3>
-        <p className={`mt-2 max-w-sm text-[14px] ${e.light ? "text-muted" : "text-white/85"}`}>{e.copy}</p>
+        <p className={`mt-3 max-w-sm text-[15px] md:text-[16px] ${e.light ? "text-muted" : "text-white/85"}`}>{e.copy}</p>
         <Link href={e.href} className={`btn mt-5 h-11 min-h-0 ${e.light ? "btn-primary" : "btn-yellow"}`}>
           {e.cta}
         </Link>
@@ -87,7 +87,8 @@ export default function HomePage() {
   const byDiscount = [...sale].sort((a, b) => Number(b.compareAtPriceRange.maxVariantPrice.amount) - Number(b.priceRange.minVariantPrice.amount) - (Number(a.compareAtPriceRange.maxVariantPrice.amount) - Number(a.priceRange.minVariantPrice.amount)));
 
   return (
-    <>
+    // The whole homepage sits on black; .theme-dark re-points the neutral tokens
+    <div className="theme-dark">
       <Hero content={HERO} />
 
       <section aria-labelledby="cat-title" className="reveal container-jd pt-12 md:pt-16">
@@ -99,12 +100,12 @@ export default function HomePage() {
                 <Image src={c.image} alt="" fill unoptimized={c.image.startsWith("http")} sizes="(min-width:1024px) 16vw, (min-width:768px) 30vw, 42vw" className="object-cover" />
                 <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
               </div>
-              <p className="mt-3 text-[14px] font-bold">{c.label}</p>
+              <p className="mt-3 text-[16px] font-bold tracking-[-0.01em] md:text-[18px]">{c.label}</p>
               <p className="t-meta">{c.n} styles</p>
             </Link>
           ))}
           <Link href="/collections/sale" className="group w-[42%] shrink-0 snap-start md:w-auto">
-            <div className="relative grid aspect-square place-items-center overflow-hidden bg-ink p-4 text-center">
+            <div className="relative grid aspect-square place-items-center overflow-hidden bg-surface p-4 text-center ring-1 ring-inset ring-line">
               <div>
                 <p className="t-eyebrow text-jd-yellow">Up to</p>
                 <p className="text-[clamp(2.75rem,5vw,4rem)] font-extrabold leading-none text-white">60%</p>
@@ -112,7 +113,7 @@ export default function HomePage() {
               </div>
               <span className="absolute inset-x-0 bottom-0 h-1.5 origin-left scale-x-0 bg-jd-yellow transition-transform duration-500 group-hover:scale-x-100" aria-hidden />
             </div>
-            <p className="mt-3 text-[14px] font-bold text-sale">Sale</p>
+            <p className="mt-3 text-[16px] font-bold tracking-[-0.01em] text-sale md:text-[18px]">Sale</p>
             <p className="t-meta">{sale.length} styles reduced</p>
           </Link>
         </div>
@@ -121,7 +122,7 @@ export default function HomePage() {
       <ProductRow id="new" title="New Arrivals" products={logoFirst(dedupe(newArrivals).filter((p) => p.category !== "Accessories")).map(toCard)} viewAll={{ href: "/collections/new-arrivals", count: newArrivals.length }} />
 
       {/* Shop by Brand — a full-bleed black stage: cut-out hero shoes, white marks */}
-      <section aria-labelledby="brand-title" className="on-dark relative mb-12 overflow-hidden bg-ink py-14 text-white md:mb-16 md:py-20">
+      <section aria-labelledby="brand-title" className="on-dark relative mb-12 overflow-hidden border-y border-line bg-ink py-14 text-white md:mb-16 md:py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,238,0,0.10),transparent_60%)]" aria-hidden />
         <div className="container-jd relative">
           <div className="mb-8 flex items-end justify-between gap-6 md:mb-10">
@@ -208,6 +209,6 @@ export default function HomePage() {
           <Image src="/campaign/store-banner.webp" alt="JD Sports store front" fill sizes="(min-width:768px) 55vw, 100vw" className="object-cover object-[80%_50%]" />
         </div>
       </section>
-    </>
+    </div>
   );
 }
