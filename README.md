@@ -69,7 +69,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - The whole page sits on black (`.theme-dark` re-points the neutral tokens).
 - Two big-photography editorial pairs and a **shoppable UGG look** with hotspots.
 - **Shop Featured Brands** tiles using brand logos.
-- Store module, and a footer whose giant JD roundel grows (75% → 100%) and fades up to full white as it scrolls into view.
+- Store module, and a footer that ends on the JD roundel, growing from 75% to 100% and fading up to full white as it scrolls into view.
 - No country pop-up: the announcement bar and CAD pricing already say where you are.
 
 **PLP**
@@ -98,7 +98,7 @@ The catalog has **258 products** (New Arrivals plus a curated set of 44 sale ite
 - Buy Now, Pay Later marks (Afterpay, Shop Pay, Sezzle, PayPal) from jdsports.ca under the price.
 - Key benefits, free-shipping qualification, returns summary and **inline store stock** under the CTA.
 - Details, story and care kept separate; fit-summary reviews.
-- One "Complete the Look" and one "You Might Also Like".
+- Reviews straight after the buy box, then one "Complete the Look" and one "You Might Also Like".
 - **Mobile sticky purchase bar**.
 - Adding to cart keeps the shopper on the page: the button confirms and the bag icon animates.
 - A sale band between Complete the Look and You Might Also Like.

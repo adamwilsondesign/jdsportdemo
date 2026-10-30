@@ -241,7 +241,9 @@
     }
   }
 
-  /* Very subtle scroll parallax for campaign imagery: the image drifts a few % slower than the page */
+  /* Very subtle scroll parallax for campaign imagery: the image drifts a few % slower than the page.
+     Its frame must crop with overflow: clip, not hidden; "hidden" makes the frame a scroll container
+     and the view() timeline would track that (static) box instead of the page. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .parallax {
@@ -253,12 +255,13 @@
   }
 
   @supports (animation-timeline: view()) {
-    .footer-reveal { view-timeline: --footer; }
+    /* the roundel tracks its own entry into the viewport; it sits at the very end of the page,
+       so it reaches full size and opacity as the shopper hits the bottom */
     @media (prefers-reduced-motion: no-preference) {
       .footer-mark {
-        transform-origin: 50% 35%;
+        transform-origin: 50% 50%;
         animation: footer-mark linear both;
-        animation-timeline: --footer;
+        animation-timeline: view();
         animation-range: entry 0% entry 100%;
       }
     }

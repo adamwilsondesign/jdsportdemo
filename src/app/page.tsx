@@ -32,7 +32,7 @@ function EditorialPair({ items, label }: { items: Editorial[]; label: string }) 
 
 function EditorialCard({ e }: { e: Editorial }) {
   return (
-    <div className="relative aspect-[4/5] overflow-hidden bg-image md:aspect-[5/6]">
+    <div className="relative aspect-[4/5] overflow-clip bg-image md:aspect-[5/6]">
       <Image src={e.img} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="parallax object-cover" style={e.position ? { objectPosition: e.position } : undefined} />
       <div className={`absolute inset-x-0 ${e.light ? "theme-light top-0 p-6 md:p-10" : "bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-28 text-white md:p-10 md:pt-40"}`}>
         <h3 className="t-h2 max-w-md">{e.title}</h3>

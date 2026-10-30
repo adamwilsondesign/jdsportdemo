@@ -14,7 +14,7 @@ const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 
 export function Footer() {
   return (
-    <footer className="footer-reveal on-dark relative mt-24 overflow-hidden bg-ink text-white">
+    <footer className="on-dark relative mt-24 overflow-clip bg-ink text-white">
       <div className="relative border-b border-white/10">
         <div className="container-jd grid grid-cols-2 gap-6 py-8 text-[13px] md:grid-cols-4">
           {[
@@ -74,12 +74,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Brand moment: the roundel rises out of the bottom edge, growing from 75% and fading up to full
-          white as the footer scrolls in. It sits in its own band so it never sits behind link text. */}
-      <div className="pointer-events-none relative h-[calc(min(960px,84vw)*0.44)] overflow-hidden" aria-hidden>
-        <div className="absolute left-1/2 top-0 w-[min(960px,84vw)] -translate-x-1/2">
-          <JDLogo size={960} className="footer-mark h-auto w-full text-white opacity-[0.056]" />
-        </div>
+      {/* Brand moment: the whole roundel closes the page, growing from 75% and fading up to full white
+          as it scrolls in. Its own band, so it never sits behind link text. */}
+      <div className="pointer-events-none flex justify-center pb-16 pt-6 md:pb-24 md:pt-10" aria-hidden>
+        <JDLogo size={440} className="footer-mark h-auto w-[min(440px,64vw)] text-white" />
       </div>
     </footer>
   );

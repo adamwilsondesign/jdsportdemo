@@ -13,7 +13,7 @@ export type HeroContent = {
 export function Hero({ content }: { content: HeroContent }) {
   return (
     <section aria-label="Featured campaign" className="relative bg-ink text-white">
-      <div className="relative aspect-[4/4.6] overflow-hidden sm:aspect-auto sm:h-[460px] lg:h-[min(560px,calc(100dvh-230px))] lg:min-h-[420px]">
+      <div className="relative aspect-[4/4.6] overflow-clip sm:aspect-auto sm:h-[460px] lg:h-[min(560px,calc(100dvh-230px))] lg:min-h-[420px]">
         <picture>
           <source media="(min-width: 640px)" srcSet={content.desktop} />
           <img src={content.mobile} alt={content.alt} fetchPriority="high" loading="eager" className="parallax absolute inset-0 h-full w-full object-cover" />

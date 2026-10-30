@@ -62,9 +62,12 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
         <ProductView key={product.handle} product={product} siblings={siblings} />
       </Suspense>
 
+      {/* Reviews sit straight after the buy box, before any cross-sell */}
+      <Reviews product={product} />
+
       {/* Distinct "Complete the Look" — complementary categories, not more of the same (brief §5.C.4) */}
       {look.length > 0 && (
-        <section aria-labelledby="ctl-title" className="container-jd mt-16 border-t border-line pt-14">
+        <section aria-labelledby="ctl-title" className="container-jd pt-8">
           <h2 id="ctl-title" className="t-h2">
             Complete the Look
           </h2>
@@ -77,8 +80,6 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
           </ul>
         </section>
       )}
-
-      <Reviews product={product} />
 
       <SaleBanner />
 
